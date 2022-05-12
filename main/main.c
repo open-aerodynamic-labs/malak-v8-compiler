@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 #include "v8/v8cmp.h"
-#include "tool/log.h"
+#include "include/v8/log.h"
 #include <stdlib.h>
 #include <io.h>
 
@@ -62,9 +62,13 @@ int main(int argc, char **argv)
         int             succode;
         int             srcsize;
         vk_source_t*    sources;
+        char            classpath[255];
+
+        /* classpath */
+        strcpy(classpath, "D:\\projects\\vnkm_v8_cmp\\vkexmp\\*");
 
         /* 遍历源码文件夹 */
-        sources = vk_scan_cp("D:/projects/vakocmp/vkexmp/*", &srcsize);
+        sources = vk_scan_cp(classpath, &srcsize);
 
         /* 初始化v8编译器 */
         vk_init_v8_cmp(sources, srcsize, &succode);

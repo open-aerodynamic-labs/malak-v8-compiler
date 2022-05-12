@@ -13,26 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#include "include/v8/v8cmp.h"
+#include "lexpas.h"
+#include "include/v8/log.h"
+#include <io.h>
 
-#include "v8/errcode.h"
+void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
+{
+        int i;
 
-/**
- * 模块声明文件
- */
-#define fmod_statement "__export__.vk"
-
-/**
- * volcanos源码文件
- */
-typedef struct vk_source {
-        char path[500];         /* 文件夹 */
-        char file[50];          /* 文件名 */
-} vk_source_t;
-
-/**
- * 初始化编译器，扫描文件结构，获取源码模块列表。
- *
- * @param [i] classpath 源码路径
- */
-void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success);
+        for (i = 0; i < srcsize; i++) {
+                vk_source_t *vksrc = &sources[i];
+                xinfo("source: path=%s, file=%s\n", vksrc->path, vksrc->file);
+        }
+}
