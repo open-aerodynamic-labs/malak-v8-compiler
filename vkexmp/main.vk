@@ -1,0 +1,18 @@
+class volc_cmdline {
+
+    int          curline;
+    int          linepos;
+    string       cmd;
+    class<line>  lines[10];
+
+    fun make_cmdline(string cmd, varargs<any> args) {
+        if (include_value(args, "-c"))
+            println("run compile.");
+
+        println("args size: {}", sizeof(args));
+
+        var version = valueof<long>(args[0]);
+        println("current version: {}", version);
+    }
+
+}

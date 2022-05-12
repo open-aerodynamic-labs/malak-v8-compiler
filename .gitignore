@@ -1,0 +1,9 @@
+.idea
+.vscode
+/.vs
+/out
+/build
+/cmake-build-debug
+
+*.iml
+*.spv

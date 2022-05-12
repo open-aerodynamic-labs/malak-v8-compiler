@@ -1,0 +1,51 @@
+@import
+@export
+
+#define
+#ifdef
+#endif
+#elif
+
+struct
+class
+fun
+const
+var
+val = const var
+static
+local = private
+goto
+if
+for
+while
+which_case = switch_case
+return
+this
+super
+null
+malloc
+free
+static
+inline
+varargs
+sizeof
+any
+void
+
+int
+char
+short
+long
+float
+double
+boolean = byte
+byte
+string
+
+true = 1
+false = 0
+
+arrayof()
+listof()
+mapof()
+valueof() // valueof<long>(argv)
