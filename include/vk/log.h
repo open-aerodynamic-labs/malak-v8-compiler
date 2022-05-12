@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#ifndef __VK_LOG_H__
+#define __VK_LOG_H__
 
-/**
- * 将源码读入内存
- */
-char *read_code(const char *file);
+#include <stdio.h>
 
-/**
- * 释放内存中读入的源码
- */
-void free_code(const char *code);
+#define xinfo(...)  printf(__VA_ARGS__)
+#define xerror(...)  printf(__VA_ARGS__)
+
+#endif /* __VK_LOG_H__ */

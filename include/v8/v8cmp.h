@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
+#ifndef __V8_CMP_H__
+#define __V8_CMP_H__
 
-#include "include/v8/errcode.h"
+#include "v8/errcode.h"
 
 /**
  * volcanos源码文件
@@ -31,3 +32,5 @@ typedef struct vk_source {
  * @param [i] classpath 源码路径
  */
 void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success);
+
+#endif /* __V8_CMP_H__ */

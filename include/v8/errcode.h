@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#pragma once
 
 /**
  * 编译器初始化失败
  */
+#ifndef __V8_ERROR_CODE_H__
+#define __V8_ERROR_CODE_H__
+
 #define V8_INIT_ERROR -1
+
+#endif /* __V8_ERROR_CODE_H__ */

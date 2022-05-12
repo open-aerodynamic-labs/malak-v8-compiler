@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "include/v8/v8cmp.h"
+#include "v8/v8cmp.h"
 #include "lexpas.h"
-#include "include/v8/log.h"
+#include "include/vk/log.h"
 #include <io.h>
 
 void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
