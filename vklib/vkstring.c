@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "vklib/strlib.h"
+#include "vklib/vkstring.h"
 #include "vklib/log.h"
 #include <string.h>
 
-char *strreplace(const char *str, const char *tok, const char *rep)
+void strreplace(char *dest, const char *str, const char *tok, const char *rep)
 {
       char*   replaced;
       int     reppos    = 0;
@@ -28,6 +28,7 @@ char *strreplace(const char *str, const char *tok, const char *rep)
       int     offsetlen = 4;
       int*    tok_offset= malloc(sizeof(int) * offsetlen);
       int     curoffset = 0;
+      size_t  rem;
 
       for (unsigned int i = 0; i < srclen; i++) {
             int findtok = str[i] == tok[curpos];
@@ -71,9 +72,10 @@ char *strreplace(const char *str, const char *tok, const char *rep)
             curpos += toklen;
       }
 
-      size_t rem = srclen - curpos;
+      rem = srclen - curpos;
       xmemcpy(replaced, reppos, str, srclen - rem, rem);
-      xmemcpy(replaced, reppos + rem, "\0", 0, 1);
+      reppos += rem;
+      xmemcpy(replaced, reppos, "\0", 0, 1);
 
-      return replaced;
+      heap_mov_stack(dest, replaced, reppos);
 }

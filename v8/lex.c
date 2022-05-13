@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __V8_STRLIB_H__
-#define __V8_STRLIB_H__
+#include "lex.h"
 
-#include "vklib/vkmem.h"
+void lexps(const char *fvk)
+{
 
-/**
- * 字符串替换
- */
-char *strreplace(const char *str, const char *tok, const char *rep);
-
-#endif /* __V8_STRLIB_H__ */
+}

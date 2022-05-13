@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __V8_CMP_LEXPAS_H__
-#define __V8_CMP_LEXPAS_H__
+#ifndef __V8_VKFILE_H__
+#define __V8_VKFILE_H__
 
 /**
- * 将源码读入内存
+ * 读取整个文件
+ *
+ * @param dest 写入目标指针
+ * @param file 文件名
+ * @param size 读取大小
  */
-char *read_code(const char *file);
+char *xfget(const char *file);
 
-/**
- * 释放内存中读入的源码
- */
-void free_code(const char *code);
-
-#endif /* __V8_CMP_LEXPAS_H__ */
+#endif /* __V8_VKFILE_H__ */

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lexp.h"
+#ifndef __V8_CMP_LEXPAS_H__
+#define __V8_CMP_LEXPAS_H__
 
-char *read_code(const char *file)
-{
-}
+/**
+ * 词法解析器
+ * @param fvk .vk源码文件路径
+ */
+void lexps(const char *fvk);
 
-void free_code(const char *code)
-{
-}
+#endif /* __V8_CMP_LEXPAS_H__ */

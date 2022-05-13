@@ -13,43 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/v8-comp.h"
+#include "v8/v8_make_cmp.h"
 #include "vklib/log.h"
-#include "vklib/strlib.h"
-#include <stdlib.h>
+#include "vklib/vkstring.h"
 #include <io.h>
+
+#define VK_EXMP_CP "D:\\projects\\varuka-v8-comp\\vkexmp\\*"
 
 /**
  * 遍历源码文件夹
  * @param classpath
  */
-inline static vk_source_t *vk_scan_cp(const char *classpath, int *srcsize)
-{
-      intptr_t                hfile;
-      struct _finddata_t      finddata;
-      const char*             pname;
-      vk_source_t*            sources;
-      int                     sourcepos;
-
-      sourcepos   = 0;
-      sources     = malloc(sizeof(vk_source_t) * 10);
-
-      hfile = _findfirst(classpath, &finddata);
-      while (_findnext(hfile, &finddata) == 0) {
-          // 获取后缀为vk的文件
-          pname = strrchr(finddata.name, '.');
-          // 后缀判断
-          if (pname != NULL && strcmp(pname, ".vk") == 0) {
-                  vk_source_t *vksrc = &sources[sourcepos];
-                  strcpy(vksrc->path, classpath);
-                  strcpy(vksrc->file, finddata.name);
-                  sourcepos++;
-          }
-      }
-
-      *srcsize = sourcepos;
-      return sources;
-}
+inline static vk_source_t *vk_scan_cp(const char *classpath, int *srcsize);
 
 /**
  * 启动编译器执行编译任务。
@@ -66,11 +41,7 @@ int main(int argc, char **argv)
       char            cp[255];
 
       /* classpath */
-      char *repcp = strreplace("D:\\projects\\vnkm_v8_cmp\\vkexmp\\*", "\\", "/");
-      heap_mov_stack(&cp, repcp, strlen(repcp) + 1);
-
-      printf("%s\n", cp);
-
+      strreplace(cp, VK_EXMP_CP, "\\", "/");
 
       /* 遍历源码文件夹 */
       sources = vk_scan_cp(cp, &srcsize);
@@ -79,4 +50,32 @@ int main(int argc, char **argv)
       vk_init_v8_cmp(sources, srcsize, &succode);
 
       return 0;
+}
+
+vk_source_t *vk_scan_cp(const char *classpath, int *srcsize)
+{
+      intptr_t                hfile;
+      struct _finddata_t      finddata;
+      const char*             pname;
+      vk_source_t*            sources;
+      int                     sourcepos;
+
+      sourcepos   = 0;
+      sources     = malloc(sizeof(vk_source_t) * 10);
+
+      hfile = _findfirst(classpath, &finddata);
+      while (_findnext(hfile, &finddata) == 0) {
+            // 获取后缀为vk的文件
+            pname = strrchr(finddata.name, '.');
+            // 后缀判断
+            if (pname != NULL && strcmp(pname, ".vk") == 0) {
+                  vk_source_t *vksrc = &sources[sourcepos];
+                  strcpy(vksrc->path, classpath);
+                  strcpy(vksrc->file, finddata.name);
+                  sourcepos++;
+            }
+      }
+
+      *srcsize = sourcepos;
+      return sources;
 }

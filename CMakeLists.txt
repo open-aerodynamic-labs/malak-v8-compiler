@@ -7,7 +7,14 @@ include_directories(${PROJECT_SOURCE_DIR} include)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/v8 v8_dir)
 aux_source_directory(${PROJECT_SOURCE_DIR}/vklib vklib_dir)
+aux_source_directory(${PROJECT_SOURCE_DIR}/vklib/io vklib_io_dir)
 aux_source_directory(${PROJECT_SOURCE_DIR}/main main_dir)
-aux_source_directory(tools tools_dir)
+aux_source_directory("" DIR_END)
 
-add_executable(${PROJECT_NAME} ${v8_dir} ${main_dir} ${vklib_dir})
+add_executable(${PROJECT_NAME}
+        ${v8_dir}
+        ${main_dir}
+        ${vklib_dir}
+        ${vklib_io_dir}
+        ${DIR_END}
+)
