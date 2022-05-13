@@ -15,8 +15,6 @@
  */
 #include "v8/v8_make_cmp.h"
 #include "lex.h"
-#include "vklib/log.h"
-#include <io.h>
 
 void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
 {
@@ -26,4 +24,8 @@ void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
                 vk_source_t *vksrc = &sources[i];
                 xinfo("source: path=%s, file=%s\n", vksrc->path, vksrc->file);
         }
+
+        codelex("var x = 2 + 2 * 3 + 3;\n"
+                     "var y = x * 2;\n"
+                     "var z = x * y;");
 }

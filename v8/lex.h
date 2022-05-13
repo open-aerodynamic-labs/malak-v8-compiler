@@ -16,10 +16,30 @@
 #ifndef __V8_CMP_LEXPAS_H__
 #define __V8_CMP_LEXPAS_H__
 
+#include "vklib/log.h"
+#include "vklib/vkstring.h"
+#include <io.h>
+
+/** token类型定义 */
+#define tokkind_t unsigned
+
+#define VK_TOK_NUM 0x000001
+#define VK_TOK_ADD 0x000010
+#define VK_TOK_SUB 0x000011
+#define VK_TOK_MUL 0x000100
+#define VK_TOK_DIV 0x000101
+#define VK_TOK_EOF 0x000111
+#define VK_TOK_EOI 0x001000
+
+typedef struct token {
+      tokkind_t   kind;
+      char        value[255];
+} token_t;
+
 /**
- * 词法解析器
- * @param fvk .vk源码文件路径
+ * 词法解析
+ * @param code 源码
  */
-void lexps(const char *fvk);
+token_t *codelex(const char *code);
 
 #endif /* __V8_CMP_LEXPAS_H__ */

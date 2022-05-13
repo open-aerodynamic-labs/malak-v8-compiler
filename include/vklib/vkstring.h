@@ -18,9 +18,7 @@
 
 #include "vklib/vkmem.h"
 
-/**
- * 字符串替换
- */
+/** 字符串替换 */
 void strreplace(char *dest, const char *str, const char *tok, const char *rep);
 
 #endif /* __V8_STRLIB_H__ */
