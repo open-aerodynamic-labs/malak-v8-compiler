@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 #include "v8/v8cmp.h"
-#include "include/vk/log.h"
+#include "tools/log.h"
+#include "tools/strlib.h"
 #include <stdlib.h>
 #include <io.h>
 
@@ -24,30 +25,30 @@
  */
 inline static vk_source_t *vk_scan_cp(const char *classpath, int *srcsize)
 {
-        intptr_t                hfile;
-        struct _finddata_t      finddata;
-        const char*             pname;
-        vk_source_t*            sources;
-        int                     sourcepos;
+      intptr_t                hfile;
+      struct _finddata_t      finddata;
+      const char*             pname;
+      vk_source_t*            sources;
+      int                     sourcepos;
 
-        sourcepos   = 0;
-        sources     = malloc(sizeof(vk_source_t) * 10);
+      sourcepos   = 0;
+      sources     = malloc(sizeof(vk_source_t) * 10);
 
-        hfile = _findfirst(classpath, &finddata);
-        while (_findnext(hfile, &finddata) == 0) {
-                // 获取后缀为vk的文件
-                pname = strrchr(finddata.name, '.');
-                if (pname != NULL && strcmp(pname, ".vk") == 0) {
-                        // 初始化源码结构体
-                        vk_source_t *vksrc = &sources[sourcepos];
-                        strcpy(vksrc->path, classpath);
-                        strcpy(vksrc->file, finddata.name);
-                        sourcepos++;
-                }
-        }
+      hfile = _findfirst(classpath, &finddata);
+      while (_findnext(hfile, &finddata) == 0) {
+          // 获取后缀为vk的文件
+          pname = strrchr(finddata.name, '.');
+          if (pname != NULL && strcmp(pname, ".vk") == 0) {
+                  // 初始化源码结构体
+                  vk_source_t *vksrc = &sources[sourcepos];
+                  strcpy(vksrc->path, classpath);
+                  strcpy(vksrc->file, finddata.name);
+                  sourcepos++;
+          }
+      }
 
-        *srcsize = sourcepos;
-        return sources;
+      *srcsize = sourcepos;
+      return sources;
 }
 
 /**
@@ -59,19 +60,21 @@ inline static vk_source_t *vk_scan_cp(const char *classpath, int *srcsize)
  */
 int main(int argc, char **argv)
 {
-        int             succode;
-        int             srcsize;
-        vk_source_t*    sources;
-        char            classpath[255];
+      int             succode;
+      int             srcsize;
+      vk_source_t*    sources;
+      char            classpath[255];
 
-        /* classpath */
-        strcpy(classpath, "D:\\projects\\v8_v8_cmp\\vkexmp\\*");
+      /* classpath */
+      strcpy(classpath, "D:\\projects\\vnkm_v8_cmp\\vkexmp\\*");
 
-        /* 遍历源码文件夹 */
-        sources = vk_scan_cp(classpath, &srcsize);
+      char *rep = strreplace("__________", "_", "/");
 
-        /* 初始化v8编译器 */
-        vk_init_v8_cmp(sources, srcsize, &succode);
+      /* 遍历源码文件夹 */
+      sources = vk_scan_cp(classpath, &srcsize);
 
-        return 0;
+      /* 初始化v8编译器 */
+      vk_init_v8_cmp(sources, srcsize, &succode);
+
+      return 0;
 }

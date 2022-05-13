@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __VK_LOG_H__
-#define __VK_LOG_H__
+#ifndef __V8_STRLIB_H__
+#define __V8_STRLIB_H__
 
-#include <stdio.h>
+/**
+ * 字符串替换
+ */
+char *strreplace(const char *str, const char *tok, const char *rep);
 
-#define xinfo(...)  printf(__VA_ARGS__)
-#define xerror(...)  printf(__VA_ARGS__)
-
-#endif /* __VK_LOG_H__ */
+#endif /* __V8_STRLIB_H__ */
