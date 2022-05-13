@@ -1,4 +1,4 @@
-class volc_cmdline {
+class vk_cmdline {
 
     int          curline;
     int          linepos;

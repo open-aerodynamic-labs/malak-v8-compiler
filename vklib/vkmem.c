@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/v8cmp.h"
-#include "lexpas.h"
-#include "tools/log.h"
-#include <io.h>
+#include "vklib/vkmem.h"
 
-void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
+#include <mem.h>
+
+void xmemcpy(void *dest, int dpos, const void *src, int spos, int size)
 {
-        int i;
+      if (size == 0)
+            return;
 
-        for (i = 0; i < srcsize; i++) {
-                vk_source_t *vksrc = &sources[i];
-                xinfo("source: path=%s, file=%s\n", vksrc->path, vksrc->file);
-        }
+      memcpy(dest + dpos, src + spos, size);
 }

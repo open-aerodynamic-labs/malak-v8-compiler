@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "lexpas.h"
+#ifndef __V8_VMEM_H__
+#define __V8_VMEM_H__
 
-char *read_code(const char *file)
-{
-}
+/**
+ * 内存拷贝
+ *
+ * @param dest  目标内存
+ * @param dpos  偏移量
+ * @param src   拷贝内存
+ * @param spos  偏移量
+ * @param size  拷贝大小
+ */
+void xmemcpy(void *dest, int dpos, const void *src, int spos, int size);
 
-void free_code(const char *code)
-{
-}
+#endif /* __V8_VMEM_H__ */

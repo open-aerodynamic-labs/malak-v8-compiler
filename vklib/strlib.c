@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "tools/strlib.h"
-#include "tools/log.h"
+#include "vklib/strlib.h"
+#include "vklib/log.h"
+#include "vklib/vkmem.h"
 #include <string.h>
 #include <malloc.h>
 
 char *strreplace(const char *str, const char *tok, const char *rep)
 {
       char*   replaced;
+      int     reppos    = 0;
       size_t  srclen    = strlen(str);
       size_t  toklen    = strlen(tok);
       size_t  replen    = strlen(rep);
       int     curpos    = 0;
       int     offsetlen = 4;
-      int*    p_offset  = malloc(sizeof(int) * offsetlen);
+      int*    tok_offset= malloc(sizeof(int) * offsetlen);
       int     curoffset = 0;
 
-      for (int i = 0; i < srclen; i++) {
+      for (unsigned int i = 0; i < srclen; i++) {
             int findtok = str[i] == tok[curpos];
 
             if (findtok)
@@ -49,20 +51,32 @@ char *strreplace(const char *str, const char *tok, const char *rep)
                   /* 如果偏移量数组不够了重新扩容 */
                   if (curoffset >= offsetlen) {
                         offsetlen = offsetlen * 4;
-                        p_offset = realloc(p_offset, sizeof(int) * offsetlen);
+                        tok_offset = realloc(tok_offset, sizeof(int) * offsetlen);
                   }
 
-                  p_offset[curoffset] = i; ++curoffset;
+                  tok_offset[curoffset] = (i + 1) - toklen;
+                  ++curoffset;
             }
       }
 
       /* 计算替换后的字符串空间大小 */
-      size_t final_len  = (srclen - toklen) + replen;
-      replaced          = (char *) malloc(final_len);
+      replaced = (char *) malloc((srclen - (toklen * curoffset)) + (replen * curoffset));
 
       for (int i = 0; i < curoffset; i++) {
-           printf("%d\n", p_offset[i]);
+            int offset = tok_offset[i];
+            int cpylen = offset - curpos;
+            xmemcpy(replaced, reppos, str, curpos, cpylen);
+            curpos += cpylen;
+            reppos += cpylen;
+            xmemcpy(replaced, reppos, rep, 0, replen);
+            reppos += replen;
+            curpos += toklen;
       }
 
+      int rem = srclen - curpos;
+      xmemcpy(replaced, reppos, str, srclen - rem, rem);
+      xmemcpy(replaced, reppos + rem, "\0", 0, 1);
+
+      printf("replaced: %s\n", replaced);
       return replaced;
 }

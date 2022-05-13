@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/v8cmp.h"
-#include "tools/log.h"
-#include "tools/strlib.h"
+#include "v8/v8-comp.h"
+#include "vklib/log.h"
+#include "vklib/strlib.h"
 #include <stdlib.h>
 #include <io.h>
+
+
 
 /**
  * 遍历源码文件夹
@@ -38,8 +40,8 @@ inline static vk_source_t *vk_scan_cp(const char *classpath, int *srcsize)
       while (_findnext(hfile, &finddata) == 0) {
           // 获取后缀为vk的文件
           pname = strrchr(finddata.name, '.');
+          // 后缀判断
           if (pname != NULL && strcmp(pname, ".vk") == 0) {
-                  // 初始化源码结构体
                   vk_source_t *vksrc = &sources[sourcepos];
                   strcpy(vksrc->path, classpath);
                   strcpy(vksrc->file, finddata.name);
@@ -68,13 +70,18 @@ int main(int argc, char **argv)
       /* classpath */
       strcpy(classpath, "D:\\projects\\vnkm_v8_cmp\\vkexmp\\*");
 
-      char *rep = strreplace("__________", "_", "/");
+      strreplace("D:\\projects\\vnkm_v8_cmp\\vkexmp\\*", "\\", "/");
+      strreplace("-x-x-", "x", "a");
+      strreplace("-fakenews-fakenews-", "fakenews", "china");
+      strreplace("-xxxxxxxxxxxxxxxxxxxxxxxx-aaaaaaaaaaaaaaaaaaa-", "xxxxxxxxxxxxxxxxxxxxxxxx", "");
 
       /* 遍历源码文件夹 */
       sources = vk_scan_cp(classpath, &srcsize);
 
       /* 初始化v8编译器 */
       vk_init_v8_cmp(sources, srcsize, &succode);
+
+
 
       return 0;
 }
