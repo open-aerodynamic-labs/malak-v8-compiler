@@ -19,8 +19,6 @@
 #include <stdlib.h>
 #include <io.h>
 
-
-
 /**
  * 遍历源码文件夹
  * @param classpath
@@ -65,23 +63,20 @@ int main(int argc, char **argv)
       int             succode;
       int             srcsize;
       vk_source_t*    sources;
-      char            classpath[255];
+      char            cp[255];
 
       /* classpath */
-      strcpy(classpath, "D:\\projects\\vnkm_v8_cmp\\vkexmp\\*");
+      char *repcp = strreplace("D:\\projects\\vnkm_v8_cmp\\vkexmp\\*", "\\", "/");
+      heap_mov_stack(&cp, repcp, strlen(repcp) + 1);
 
-      strreplace("D:\\projects\\vnkm_v8_cmp\\vkexmp\\*", "\\", "/");
-      strreplace("-x-x-", "x", "a");
-      strreplace("-fakenews-fakenews-", "fakenews", "china");
-      strreplace("-xxxxxxxxxxxxxxxxxxxxxxxx-aaaaaaaaaaaaaaaaaaa-", "xxxxxxxxxxxxxxxxxxxxxxxx", "");
+      printf("%s\n", cp);
+
 
       /* 遍历源码文件夹 */
-      sources = vk_scan_cp(classpath, &srcsize);
+      sources = vk_scan_cp(cp, &srcsize);
 
       /* 初始化v8编译器 */
       vk_init_v8_cmp(sources, srcsize, &succode);
-
-
 
       return 0;
 }

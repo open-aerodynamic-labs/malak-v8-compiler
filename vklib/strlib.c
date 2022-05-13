@@ -15,9 +15,7 @@
  */
 #include "vklib/strlib.h"
 #include "vklib/log.h"
-#include "vklib/vkmem.h"
 #include <string.h>
-#include <malloc.h>
 
 char *strreplace(const char *str, const char *tok, const char *rep)
 {
@@ -60,7 +58,7 @@ char *strreplace(const char *str, const char *tok, const char *rep)
       }
 
       /* 计算替换后的字符串空间大小 */
-      replaced = (char *) malloc((srclen - (toklen * curoffset)) + (replen * curoffset));
+      replaced = (char *) malloc((srclen - (toklen * curoffset)) + (replen * curoffset) + 1);
 
       for (int i = 0; i < curoffset; i++) {
             int offset = tok_offset[i];
@@ -73,10 +71,9 @@ char *strreplace(const char *str, const char *tok, const char *rep)
             curpos += toklen;
       }
 
-      int rem = srclen - curpos;
+      size_t rem = srclen - curpos;
       xmemcpy(replaced, reppos, str, srclen - rem, rem);
       xmemcpy(replaced, reppos + rem, "\0", 0, 1);
 
-      printf("replaced: %s\n", replaced);
       return replaced;
 }

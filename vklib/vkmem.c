@@ -15,9 +15,13 @@
  */
 #include "vklib/vkmem.h"
 
-#include <mem.h>
+void heap_mov_stack(void *stack, void *heap, size_t hsize)
+{
+      xmemcpy(stack, 0, heap, 0, hsize);
+      free(heap);
+}
 
-void xmemcpy(void *dest, int dpos, const void *src, int spos, int size)
+void xmemcpy(void *dest, size_t dpos, const void *src, size_t spos, size_t size)
 {
       if (size == 0)
             return;

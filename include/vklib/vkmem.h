@@ -16,6 +16,18 @@
 #ifndef __V8_VMEM_H__
 #define __V8_VMEM_H__
 
+#include <mem.h>
+#include <malloc.h>
+
+/**
+ * 堆中的指针内容转移到栈上
+ *
+ * @param stack 作用域在栈上的指针
+ * @param heap  作用域在堆上的指针
+ * @param hsize 堆的数据大小
+ */
+void heap_mov_stack(void *stack, void *heap, size_t hsize);
+
 /**
  * 内存拷贝
  *
@@ -25,6 +37,6 @@
  * @param spos  偏移量
  * @param size  拷贝大小
  */
-void xmemcpy(void *dest, int dpos, const void *src, int spos, int size);
+void xmemcpy(void *dest, size_t dpos, const void *src, size_t spos, size_t size);
 
 #endif /* __V8_VMEM_H__ */

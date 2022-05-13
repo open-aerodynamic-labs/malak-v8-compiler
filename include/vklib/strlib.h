@@ -16,6 +16,8 @@
 #ifndef __V8_STRLIB_H__
 #define __V8_STRLIB_H__
 
+#include "vklib/vkmem.h"
+
 /**
  * 字符串替换
  */
