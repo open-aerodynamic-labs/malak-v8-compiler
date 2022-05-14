@@ -17,14 +17,16 @@
 
 #define nextchar()  ++code
 #define nextline()  { ++line; goto CODE_LEX_NEXT_CHAR; }
-#define puttok(x)   tok[pos] = x; ++pos;
+#define puttok(x)   tok[pos] = x; ++pos
 #define resettok()  memset(tok, 0, sizeof(tok)); pos = 0
+#define eoi(ch)     (ch == ';')
 
 /** --------------------- 编译状态 ---------------------- */
 
 #define VK_PHASE_NOP          0     /* 什么都不做 */
 #define VK_PHASE_NEXT_CHR     1     /* 扫描TOK中 */
 #define VK_PHASE_TOK          2     /* 扫描到一个tok */
+#define VK_PHASE_EOI          3     /* 扫描到结束符 */
 
 /** --------------------------------------------------- */
 
@@ -33,12 +35,6 @@ int let(char ch)
 {
       return (ch >= 'a' && ch <= 'z') ||
              (ch >= 'A' && ch <= 'Z') || ch == '$';
-}
-
-/** 当前字符是不是结束符 */
-int eoi(char ch)
-{
-      return ch == ';' || ch == '(' || ch == ')';
 }
 
 token_t *codelex(const char *code)
@@ -57,14 +53,20 @@ token_t *codelex(const char *code)
             if (ch == '\n')
                   nextline();
 
-            if (ch == ' ' || eoi(ch))
+            if (isspace(ch))
                   phase = VK_PHASE_TOK;
 
+            if (eoi(ch)) {
+                  phase = VK_PHASE_EOI;
+            }
+
             switch(phase) {
+                  /* 下一个字符 */
                   case VK_PHASE_NEXT_CHR: {
                         puttok(ch);
                         goto CODE_LEX_NEXT_CHAR;
                   }
+                  /* 扫描到tok */
                   case VK_PHASE_TOK: {
                         printf("tok='%s', line=%d\n", tok, line);
                         resettok();

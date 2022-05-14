@@ -18,6 +18,8 @@
 
 #include "vklib/vkmem.h"
 
+/** 是不是空格 */
+#define isspace(ch) (ch == ' ')
 /** 字符串替换 */
 void strreplace(char *dest, const char *str, const char *tok, const char *rep);
 
