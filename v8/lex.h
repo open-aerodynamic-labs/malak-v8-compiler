@@ -20,26 +20,31 @@
 #include "vklib/vkstring.h"
 #include <io.h>
 
-/** token类型定义 */
-#define tokkind_t unsigned
+/** -------------------- token类型定义 ----------------------- */
 
-#define VK_TOK_NUM 0x000001
-#define VK_TOK_ADD 0x000010
-#define VK_TOK_SUB 0x000011
-#define VK_TOK_MUL 0x000100
-#define VK_TOK_DIV 0x000101
-#define VK_TOK_EOF 0x000111
-#define VK_TOK_EOI 0x001000
+typedef unsigned kind_t;
+
+#define VK_KIND_NUM 0x000001
+#define VK_KIND_ADD 0x000010
+#define VK_KIND_SUB 0x000011
+#define VK_KIND_MUL 0x000100
+#define VK_KIND_DIV 0x000101
+#define VK_KIND_EOF 0x000111
+#define VK_KIND_EOI 0x001000
+#define VK_KIND_INT 0x001001
+
+/** ------------------------------------------------------ */
 
 typedef struct token {
-      tokkind_t   kind;
-      char        value[255];
-} token_t;
+      kind_t   kind;
+      int      line;
+      char     value[255];
+} tok_t;
 
 /**
  * 词法解析
  * @param code 源码
  */
-token_t *codelex(const char *code);
+tok_t *lexps(const char *code);
 
 #endif /* __V8_CMP_LEXPAS_H__ */

@@ -19,7 +19,19 @@
 #include "vklib/vkmem.h"
 
 /** 是不是空格 */
-#define isspace(ch) (ch == ' ')
+inline static int isspc(char ch)
+{
+      return ch == ' ';
+}
+
+/** 字符串比较 */
+inline static int xstrcmp(const char *x, const char *y)
+{
+      return strcmp(x, y) == 0;
+}
+
+/** 是不是数字 */
+int isnumber(const char *str);
 /** 字符串替换 */
 void strreplace(char *dest, const char *str, const char *tok, const char *rep);
 

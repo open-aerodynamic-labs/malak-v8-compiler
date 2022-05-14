@@ -1,18 +1,17 @@
-class vk_cmdline {
+class VkCmd {
 
-    int          curline;
-    int          linepos;
-    string       cmd;
-    class<line>  lines[10];
+    string  cmd;
+    int     line;
 
-    fun make_cmdline(string cmd, varargs<any> args) {
-        if (include_value(args, "-c"))
-            println("run compile.");
-
-        println("args size: {}", sizeof(args));
-
-        var version = valueof<long>(args[0]);
-        println("current version: {}", version);
+    fun varuka(string cp) {
+        if cp == "/" {
+            ...
+        }
     }
 
+}
+
+fun main(varargs<string> args) {
+    var vkcmd = init<VkCmd>();
+    vkcmd->varuka("/");
 }

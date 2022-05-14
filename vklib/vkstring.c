@@ -17,6 +17,19 @@
 #include "vklib/log.h"
 #include <string.h>
 
+int isnumber(const char *str)
+{
+      char ch;
+
+      while((ch = *str) != '\0') {
+            if (!(ch >= '0' && ch <= '9'))
+                  return 0;
+            ++str;
+      }
+
+      return 1;
+}
+
 void strreplace(char *dest, const char *str, const char *tok, const char *rep)
 {
       char*   replaced;
