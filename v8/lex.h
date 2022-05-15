@@ -35,16 +35,16 @@ typedef unsigned kind_t;
 
 /** ------------------------------------------------------ */
 
-typedef struct token {
+struct token {
       kind_t   kind;
       int      line;
       char     value[255];
-} tok_t;
+};
 
 /**
  * 词法解析
  * @param code 源码
  */
-tok_t *lexps(const char *code);
+struct token *lexps(const char *code, size_t *len);
 
 #endif /* __V8_CMP_LEXPAS_H__ */

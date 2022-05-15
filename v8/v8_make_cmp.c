@@ -25,5 +25,5 @@ void vk_init_v8_cmp(vk_source_t *sources, int srcsize, int *success)
                 xinfo("source: path=%s, file=%s\n", vksrc->path, vksrc->file);
         }
 
-        lexps("int x = 2 * 2;\n");
+        lexps("int x = 2 * 2;\n", NULL);
 }

@@ -15,147 +15,73 @@
  */
 #include "lex.h"
 
-#define nextchar()  ++code
-#define nextline()  { ++line; goto CODE_LEX_NEXT_CHAR; }
-#define puttok(x)   tokident[pos] = x; ++pos
-#define resettok()  memset(tokident, 0, sizeof(tokident)); pos = 0
-#define eoi(ch)     (ch == ';')
+#define VK_SYMBOL_EQ    "="
+#define VK_SYMBOL_ADD   "+"
+#define VK_SYMBOL_SUB   "-"
+#define VK_SYMBOL_MUL   "*"
+#define VK_SYMBOL_DIV   "/"
 
-/** --------------------- 编译状态 ---------------------- */
+#define VK_STATE_NOP    0x00000
+#define VK_STATE_INT    0x00001
 
-#define VK_PHASE_NOP          0     /* 什么都不做 */
-#define VK_PHASE_NEXT_CHR     1     /* 扫描TOK中 */
-#define VK_PHASE_TOK          2     /* 扫描到一个tok */
-#define VK_PHASE_EOI          3     /* 扫描到结束符 */
-
-/** ----------------------- 符号 ------------------------ */
-
-#define setkind(p_kind, kind, p_state, state) { *p_kind = kind; *p_state = state; return; }
-
-#define VK_SYMBOL_ADD    "+"
-#define VK_SYMBOL_SUB    "-"
-#define VK_SYMBOL_MUL    "*"
-#define VK_SYMBOL_DIV    "/"
-#define VK_SYMBOL_EOI    ";"
-#define VK_SYMBOL_INT    "int"
-
-/** --------------------- 当前状态 ---------------------- */
-
-typedef unsigned state_t;
-
-#define VK_STATE_ERR             0     /* 错误tok */
-#define VK_STATE_NOP             1     /* 无状态（默认状态）*/
-#define VK_STATE_STATEMENT_INT   2     /* 声明一个int变量 */
-
-/** 检索tok类型 */
-void search_state(const char *tok, kind_t *p_kind, state_t *p_state)
+void _addtok(struct token* arrtok, int *idxtok, const char *value, kind_t kind, int curline)
 {
-      if (xstrcmp(tok, VK_SYMBOL_INT))
-            setkind(p_kind, VK_KIND_INT, p_state, VK_STATE_STATEMENT_INT)
+      struct token* tok;
+
+      tok = &arrtok[*idxtok];
+      xstrcmp(tok->value, "x");
+      tok->kind = VK_KIND_ADD;
+      tok->line = curline;
+
+      *idxtok = *idxtok + 1;
 }
 
-/** 识别tok分类 */
-void scankind(const char *tok, kind_t *kind)
+struct token *lexps(const char *code, size_t *len)
 {
-      static state_t state = VK_STATE_NOP;
+      char              ch;
+      struct token*     arrtok;
+      int               idxtok = 0;
+      int               curline = 1;
+      unsigned          cur_state = VK_STATE_NOP;
+      unsigned          prev_state = VK_STATE_NOP;
+      char              value[255];
+      int               idxval = 0;
 
-      /* 根据状态推导 */
-      switch (state) {
-            case VK_STATE_NOP: {
-                  search_state(tok, kind, &state);
-                  goto SCANKIND_OUT;
+/* 清空字符串数组 */
+#define cleanv()        memset(value, 0, sizeof(value)); idxval = 0
+/* 添加tok并清空字符串数组 */
+#define addtok(v, k, l) _addtok(arrtok, &idxtok, v, k, l); cleanv()
+/* 添加一个字符到字符串数组 */
+#define putvalue(ch)    value[idxval] = ch; ++idxval
+/* while循环下一个字符 */
+#define nextchar(x)     ++x
+
+      arrtok = malloc(sizeof(struct token) * 20);
+
+      while ((ch = *code) != '\0') {
+
+            if (ch == '\n') {
+                  ++curline;
+                  goto NEXT_CHAR_FLAG;
             }
 
-            /*
-             * 如果当前tok是声明一个int变量，可以推导出以下写法：
-             *
-             *    int x;
-             *    int x = 0;
-             *    int x = y + x ... + n;
-             *
-             */
-            case VK_STATE_STATEMENT_INT: {
-            }
-
-      }
-
-SCANKIND_OUT:
-      if (state != VK_STATE_ERR)
-            return;
-}
-
-/**
- * 添加一个新扫描到的tok
- *
- * @param arrtok    tok数组
- * @param tokidx    tok数组当前下标
- * @param line      tok行数
- * @param value     tok字符
- */
-void addtok(tok_t *arrtok, int *tokidx, int line, const char *value)
-{
-      static kind_t lastkind;
-
-      scankind(value, &lastkind);
-
-      tok_t *elem = &arrtok[*tokidx];
-      elem->line = line;
-      elem->kind = 0;
-      strcpy(elem->value, value);
-      *tokidx = *tokidx + 1;
-}
-
-/**
- * 词法解析器
- * @param code 源码字符串
- */
-tok_t *lexps(const char *code)
-{
-      /* 一个完整的token文本 */
-      char        tokident[255];
-      unsigned    pos = 0;
-      int         line = 0;
-      int         phase = VK_PHASE_NEXT_CHR;
-      tok_t*      arrtok = malloc(sizeof(tok_t) * 20); /* token数组 */
-      int         tokidx = 0;
-      char        ch;
-
-      /* 循环读取源码 */
-      while((ch = *code) != '\0')
-      {
-            if (ch == '\n')
-                  nextline();
-
-            if (isspc(ch))
-                  phase = VK_PHASE_TOK;
-
-            /* 如果是结束符 */
-            if (eoi(ch))
-                  phase = VK_PHASE_EOI;
-
-            switch(phase) {
-                  /* 下一个字符 */
-                  case VK_PHASE_NEXT_CHR: {
-                        puttok(ch);
-                        goto CODE_LEX_NEXT_CHAR;
+            switch (ch) {
+                  case ' ': {
+                        if (xstrcmp(value, "int")) {
+                              cur_state = VK_STATE_INT;
+                              addtok(value, VK_KIND_INT, curline);
+                              goto NEXT_CHAR_FLAG;
+                        }
                   }
-                  /* 扫描到tok */
-                  case VK_PHASE_TOK: {
-                        addtok(arrtok, &tokidx, line, tokident);
-                        resettok();
-                        phase = VK_PHASE_NEXT_CHR;
-                        goto CODE_LEX_NEXT_CHAR;
+
+                  default: {
+                        putvalue(ch);
+                        goto NEXT_CHAR_FLAG;
                   }
             }
 
-            /** next char */
-CODE_LEX_NEXT_CHAR:
-            nextchar();
-      }
-
-      for (int i = 0; i < tokidx; i++) {
-            tok_t tok = arrtok[i];
-            printf("tok='%s', line=%d, kind=%d\n", tok.value, tok.line, tok.kind);
+NEXT_CHAR_FLAG:
+            nextchar(code);
       }
 
       return NULL;
