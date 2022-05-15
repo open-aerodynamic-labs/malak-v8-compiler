@@ -49,12 +49,13 @@ object Token extends Enumeration {
   True, False, Null, Struct, Sizeof, Init,
   Valueof, Typedef,
 
-  Eof = Value
+  Nop, Eof = Value
+
 }
 
 /**
  * 词法解析器token
  */
-class Token(val kind: TokenKind, val value: String, val line: Int, val col: Int) {
+class Token(val value: String, val kind: TokenKind, val line: Int, val col: Int) {
   override def toString = kind.toString + ":" + value
 }

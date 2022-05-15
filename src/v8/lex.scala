@@ -15,6 +15,8 @@
  */
 package v8
 
+import v8.Token.{Nop, TokenKind}
+
 /**
  * 源码读取器
  */
@@ -63,17 +65,20 @@ object Lexer {
     var code =
       """
         | var x = 2;
-        | var y = 4;
-        | x = x * y;
         |""".stripMargin;
-    var reader = new SourceReader(code);
-
-    while (!reader.eof()) {
-      var ch = reader.advance();
-      println(ch);
-    }
-
+    lexps(code);
   }
+
+  /**
+   * 是不是空格
+   */
+  def isspace(ch: Char): Boolean = {
+    return ch == ' ' || ch == '\t' ||
+      ch == '\n' || ch == '\r';
+  }
+
+  def v8_make_token(value: String, kind: TokenKind, line: Int, col: Int): Token
+    = new Token(value, kind, line, col);
 
   /**
    * 词法解析器
@@ -81,7 +86,42 @@ object Lexer {
    * @param source 输入源
    */
   def lexps(input_code: String): List[Token] = {
-    return null;
+    var reader = new SourceReader(input_code);
+
+    /* token内容 */
+    var tokbuild = new StringBuilder();
+
+    /* token集合 */
+    var toklist: List[Token] = List();
+
+    /* 遍历输入源码 */
+    var tok: Token = null;
+    var ch: Character = null;
+    while (!reader.eof()) {
+      ch = reader.advance();
+      var spc = isspace(ch);
+
+      if (spc) {
+        if (tokbuild.length > 0) {
+          tok = v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col)
+          toklist = tok :: toklist;
+          tokbuild.clear();
+        }
+      } else {
+        tokbuild.append(ch);
+      }
+    }
+
+    /* 如果最后还有token */
+    if (tokbuild.length() > 0) {
+      toklist.appended(v8_make_token(tokbuild.toString(), null, reader.line, reader.col));
+    }
+
+    toklist.foreach((tok: Token) => {
+      println(tok.toString());
+    });
+
+    return toklist;
   }
 
 }
