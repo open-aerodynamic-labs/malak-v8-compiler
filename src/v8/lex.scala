@@ -17,6 +17,8 @@ package v8
 
 import v8.Token.{Nop, TokenKind}
 
+import java.util
+
 /**
  * 源码读取器
  */
@@ -85,17 +87,16 @@ object Lexer {
    *
    * @param source 输入源
    */
-  def lexps(input_code: String): List[Token] = {
+  def lexps(input_code: String): util.List[Token] = {
     var reader = new SourceReader(input_code);
 
     /* token内容 */
     var tokbuild = new StringBuilder();
 
     /* token集合 */
-    var toklist: List[Token] = List();
+    var toklist = new util.ArrayList[Token]();
 
     /* 遍历输入源码 */
-    var tok: Token = null;
     var ch: Character = null;
     while (!reader.eof()) {
       ch = reader.advance();
@@ -103,8 +104,7 @@ object Lexer {
 
       if (spc) {
         if (tokbuild.length > 0) {
-          tok = v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col)
-          toklist = tok :: toklist;
+          toklist.add(v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col));
           tokbuild.clear();
         }
       } else {
@@ -114,10 +114,10 @@ object Lexer {
 
     /* 如果最后还有token */
     if (tokbuild.length() > 0) {
-      toklist.appended(v8_make_token(tokbuild.toString(), null, reader.line, reader.col));
+      toklist.add(v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col));
     }
 
-    toklist.foreach((tok: Token) => {
+    toklist.forEach((tok: Token) => {
       println(tok.toString());
     });
 
