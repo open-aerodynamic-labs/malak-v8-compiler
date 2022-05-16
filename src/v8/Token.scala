@@ -23,35 +23,33 @@ import v8.Token.TokenKind
 object Token extends Enumeration {
   type TokenKind = Value
   val
-  /* 单个字符 token */
-  kLeftParen, kRightParen,              // ( )
-  kLeftBracket, kRightBracket,          // [ ]
-  kLeftBrace, kRightBrace,              // { }
-  kComma, kDot,                         // , .
-  kPlus, kMinus,                        // + -
-  kSemicolon, kSlash, kStar,            // ; / *
+  /* 单个字符 toen */
+  LeftParen, RightParen,              // ( )
+  LeftBracket, RightBracket,          // [ ]
+  LeftBrace, RightBrace,              // { }
+  Comma, Dot,                         // , .
+  Plus, Minus,                        // + -
+  Semicolon, Slash, Star,             // ; / *
 
-  // 一个或多个字符 token
-  kBang, kBangEqual,                    // ! !=
-  kEqual, kEqualEqual,                  // = ==
-  kGreater, kGreaterEqual,              // > >=
-  kLess, kLessEqual,                    // < <=
+  // 一个或多个字符 toen
+  Bang, BangEqual,                    // ! !=
+  Equal, EqualEqual,                  // = ==
+  Greater, GreaterEqual,              // > >=
+  Less, LessEqual,                    // < <=
 
   // 字面量
-  kIdentifier, kString, kNumber,         // 标识符、字符串和数字
+  Identifier, _String, Number,         // 标识符、字符串和数字
 
   // 关键字.
-  kClass, kEnum, kInterface, kFunc, kVar, kConst,
-  kThis, kSuper, kIf, Else, kFor, kWhile,
-  kSwitch, kCase, kDefault, kBreak, kContinue,
-  kReturn, kGoto, kImport, kExport, kIn, kStatic,
-  kInt, kLong, kShort, kFloat, kDouble, kBool, kChar,
-  kTrue, kFalse, kNull, kStruct, kSizeof, kInit,
-  kValueof, kTypedef,
+  Class, Enum, Interface, Func, Var, Const,
+  This, Super, If, Else, For, While,
+  Switch, Case, Default, Brea, Continue,
+  Return, Goto, Import, Export, In, Static,
+  Int, Long, Short, Float, Double, Bool, Char,
+  True, False, Null, Struct, Sizeof, Init,
+  Valueof, Typedef,
 
-  kComment, kEoi, kSpace, kError, kUnknown, kNop,
-
-  kEof = Value
+  Eoi, Eof = Value
 
 }
 

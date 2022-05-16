@@ -16,12 +16,12 @@
 package v8
 
 import v8.Token.*
+import v8.LexicalAnalysis.{isspace, v8_make_token}
 
 /**
  * 源码读取器
  */
 class SourceReader(inputc: String) {
-
   var line: Int = 0;
   var col: Int = 0;
   var pos: Int = 0;
@@ -35,10 +35,8 @@ class SourceReader(inputc: String) {
     return pos >= size;
   }
 
-  /**
-   * 获取下一个字符
-   */
-  def advance(): Character = {
+  /** 获取下一个字符 */
+  def look_ahead(): Char = {
     var ch = inputc.charAt(pos);
     pos += 1;
 
@@ -57,6 +55,7 @@ class SourceReader(inputc: String) {
     return ch;
   }
 
+  /** 回退一个字符 */
   def back(): Unit = {
     pos -= 1;
 
@@ -67,123 +66,86 @@ class SourceReader(inputc: String) {
       line -= 1;
 
   }
-
 }
 
-/**
- * 解析状态
- */
-object StatPs extends Enumeration {
-  type StatPs = Value
-  val
-  StatNop, StatEoi, StatNumber,
-  StatString, StatComment,
-  Eof = Value
-}
-
-
-/**
- * 词法解析器
- */
-object Lexer {
-
+object LexicalAnalysis {
   def main(args: Array[String]): Unit = {
-    var code =
-      """
-        | var x = 2;
-        |""".stripMargin;
-    lexps(code);
+    var code = "var x = 2;";
+    new LexicalAnalysis(code).lexps();
   }
 
   /** 是不是空格 */
-  def isspace(ch: Char): Boolean =
-    (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+  def isspace(ch: Char): Boolean =(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
 
+  /** 结束符 */
   def eoi(ch: Char): Boolean = ch == ';';
 
   /** 是不是数字 */
   def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9';
 
-  def v8_make_token(value: String, kind: TokenKind, line: Int, col: Int): Token
-  = new Token(value, kind, line, col);
+  /** 创建tok */
+  def v8_make_token(value: String, kind: TokenKind, line: Int, col: Int): Token = new Token(value, kind, line, col);
+}
 
-  /**
-   * 词法解析器
-   *
-   * @param source 输入源
-   */
-  def lexps(input_code: String): List[Token] = {
-    var reader = new SourceReader(input_code);
+object LexicalAnalysisState extends Enumeration {
+  type LexicalAnalysisState = Value
+  val
+  Nop,        // 空状态
+  Plus,       // +
+  PlusEq,     // +=
+  Minus,      // -
+  Star,       // *
+  Slash,      // /
+  Perce,      // %
+  Eof = Value
+}
 
-    var stat = kNop
-    var kind = kNop;
-    var tokbuild = new StringBuilder();
-    var toklist = listof[Token]();
+/**
+ * 词法解析器
+ */
+class LexicalAnalysis(val code: String) {
+  private var reader = new SourceReader(code);
+  private var curtok = new StringBuilder();
+  var tokens: List[Token] = listof();
+  var state: LexicalAnalysisState.Value = LexicalAnalysisState.Nop;
 
+  /** 追加tok字符 */
+  private def apptok(ch: Char): Unit = curtok.append(ch);
+
+  private def puttok(kind: TokenKind): Unit = {
+    puttok(kind, curtok.toString())
+    curtok.clear();
+  };
+
+  private def puttok(kind: TokenKind, ch: Char): Unit = {
+    puttok(kind, String.valueOf(ch));
+  }
+
+  private def puttok(kind: TokenKind, value: String): Unit = {
+    tokens.add(v8_make_token(value, kind, reader.line, reader.col));
+  }
+
+  /** 词法解析 */
+  def lexps(): List[Token] = {
     /* 遍历输入源码 */
-    var ch: Character = null;
+    var ch: Char = 0;
     while (!reader.eof()) {
-      ch = reader.advance();
+      ch = reader.look_ahead();
 
-      if (isspace(ch)) {
-        stat = kSpace;
-      }
-
-      stat match {
-        case Token.kNop => {
-          if (isnumber(ch))
-            stat = kNumber;
-          else if (ch == '"')
-            stat = kString;
-          else if (ch == '/')
-            stat = kComment;
-          else if (eoi(ch))
-            stat = kEoi;
-          else
-            tokbuild.append(ch);
-        }
-        case Token.kNumber => {
-          if (isnumber(ch))
-            tokbuild.append(ch);
-          else {
-            ch match {
-              case '.' => {
-                stat = kNumber;
-                tokbuild.append(ch);
-              };
-              case _ => {
-                kind = stat;
-                stat = kNop;
-                reader.back();
-              }
-            }
-          }
-        }
-        case Token.kEoi => {
-          toklist.add(v8_make_token(tokbuild.toString(), kEoi, reader.line, reader.col));
-          tokbuild.clear();
-          stat = kNop;
-        }
-        case Token.kSpace => {
-          if (tokbuild.length > 0) {
-            toklist.add(v8_make_token(tokbuild.toString(), Token.kIdentifier, reader.line, reader.col));
-            tokbuild.clear();
-          }
-          stat = kNop;
+      /* 开始解析 */
+      if (!isspace(ch)) {
+        ch match {
+          // todo
         }
       }
+
     }
 
-    /* 如果最后还有token */
-    if (tokbuild.length() > 0) {
-      toklist.add(v8_make_token(tokbuild.toString(), stat, reader.line, reader.col));
-    }
-
-    toklist.forEach((tok: Token) => {
+    /* 打印 token 列表 */
+    tokens.forEach((tok: Token) => {
       println(tok.toString());
     });
 
-    return toklist;
+    return tokens;
   }
-
 }
