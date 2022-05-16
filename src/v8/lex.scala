@@ -15,9 +15,7 @@
  */
 package v8
 
-import v8.Token.{Nop, TokenKind}
-
-import java.util
+import v8.Token.*
 
 /**
  * 源码读取器
@@ -59,8 +57,34 @@ class SourceReader(inputc: String) {
     return ch;
   }
 
+  def back(): Unit = {
+    pos -= 1;
+
+    if (col > 0)
+      col -= 1;
+
+    if (inputc.charAt(pos) == '\n')
+      line -= 1;
+
+  }
+
 }
 
+/**
+ * 解析状态
+ */
+object StatPs extends Enumeration {
+  type StatPs = Value
+  val
+  StatNop, StatEoi, StatNumber,
+  StatString, StatComment,
+  Eof = Value
+}
+
+
+/**
+ * 词法解析器
+ */
 object Lexer {
 
   def main(args: Array[String]): Unit = {
@@ -71,50 +95,88 @@ object Lexer {
     lexps(code);
   }
 
-  /**
-   * 是不是空格
-   */
-  def isspace(ch: Char): Boolean = {
-    return ch == ' ' || ch == '\t' ||
-      ch == '\n' || ch == '\r';
-  }
+  /** 是不是空格 */
+  def isspace(ch: Char): Boolean =
+    (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+
+  def eoi(ch: Char): Boolean = ch == ';';
+
+  /** 是不是数字 */
+  def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9';
 
   def v8_make_token(value: String, kind: TokenKind, line: Int, col: Int): Token
-    = new Token(value, kind, line, col);
+  = new Token(value, kind, line, col);
 
   /**
    * 词法解析器
    *
    * @param source 输入源
    */
-  def lexps(input_code: String): util.List[Token] = {
+  def lexps(input_code: String): List[Token] = {
     var reader = new SourceReader(input_code);
 
-    /* token内容 */
+    var stat = kNop
+    var kind = kNop;
     var tokbuild = new StringBuilder();
-
-    /* token集合 */
-    var toklist = new util.ArrayList[Token]();
+    var toklist = listof[Token]();
 
     /* 遍历输入源码 */
     var ch: Character = null;
     while (!reader.eof()) {
       ch = reader.advance();
-      var spc = isspace(ch);
 
-      if (spc) {
-        if (tokbuild.length > 0) {
-          toklist.add(v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col));
-          tokbuild.clear();
+      if (isspace(ch)) {
+        stat = kSpace;
+      }
+
+      stat match {
+        case Token.kNop => {
+          if (isnumber(ch))
+            stat = kNumber;
+          else if (ch == '"')
+            stat = kString;
+          else if (ch == '/')
+            stat = kComment;
+          else if (eoi(ch))
+            stat = kEoi;
+          else
+            tokbuild.append(ch);
         }
-      } else {
-        tokbuild.append(ch);
+        case Token.kNumber => {
+          if (isnumber(ch))
+            tokbuild.append(ch);
+          else {
+            ch match {
+              case '.' => {
+                stat = kNumber;
+                tokbuild.append(ch);
+              };
+              case _ => {
+                kind = stat;
+                stat = kNop;
+                reader.back();
+              }
+            }
+          }
+        }
+        case Token.kEoi => {
+          toklist.add(v8_make_token(tokbuild.toString(), kEoi, reader.line, reader.col));
+          tokbuild.clear();
+          stat = kNop;
+        }
+        case Token.kSpace => {
+          if (tokbuild.length > 0) {
+            toklist.add(v8_make_token(tokbuild.toString(), Token.kIdentifier, reader.line, reader.col));
+            tokbuild.clear();
+          }
+          stat = kNop;
+        }
       }
     }
 
     /* 如果最后还有token */
     if (tokbuild.length() > 0) {
-      toklist.add(v8_make_token(tokbuild.toString(), Nop, reader.line, reader.col));
+      toklist.add(v8_make_token(tokbuild.toString(), stat, reader.line, reader.col));
     }
 
     toklist.forEach((tok: Token) => {
