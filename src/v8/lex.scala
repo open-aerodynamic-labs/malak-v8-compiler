@@ -114,8 +114,8 @@ object LexicalAnalysis {
   def main(args: Array[String]): Unit = {
     var code =
       """
-        |var x: int = 80;
-        |var y: long = 80L;
+        |var x: int = 80 ;
+        |var y: long = 80L ;
         |""".stripMargin;
     new LexicalAnalysis(code).lexps();
   }
@@ -158,6 +158,48 @@ class LexicalAnalysis(val code: String) {
     tokens.add(make_tok(value, kind, reader.line, reader.col - value.length()));
   }
 
+  /** 解析数字 */
+  private def lexnum(exp_ch: Char): Unit = {
+    var ch: Char = exp_ch;
+    apptok(ch);
+    breakable {
+      while (!reader.eof()) {
+        ch = reader.look_ahead();
+        /* 如果不是数字判断是不是'L'或者'l'再或者是不是'.' */
+        if (!isnumber(ch)) {
+          if (eoi(ch)) {
+            if (curtok.contains('.')) {
+              puttok(SyntaxKind.Float);
+            } else {
+              puttok(SyntaxKind.Int);
+            }
+
+            reader.back();
+            break();
+          }
+
+          /* 长整型 */
+          if ((ch == 'L' || ch == 'l') && eoi(reader.peek_next())) {
+            apptok(ch);
+            puttok(SyntaxKind.Long);
+
+            reader.back();
+            break();
+          }
+
+          /* 小数 */
+          if (ch == '.') {
+            apptok(ch);
+          } else {
+            throw new IllegalSyntaxException(s"语法错误, 行=${reader.line}, 列=${reader.col}");
+          }
+        } else {
+          apptok(ch);
+        }
+      }
+    }
+  }
+
   /** 词法解析 */
   def lexps(): List[Token] = {
     /* 遍历输入源码 */
@@ -180,40 +222,7 @@ class LexicalAnalysis(val code: String) {
       if (!spc && let(ch)) {
         /* 如果是数字就一直读，读到结束 */
         if (isnumber(ch)) {
-          apptok(ch);
-          breakable {
-            while (!reader.eof()) {
-              ch = reader.look_ahead();
-              /* 如果不是数字判断是不是'L'或者'l'再或者是不是'.' */
-              if (!isnumber(ch)) {
-                if (eoi(ch)) {
-                  if (curtok.contains('.')) {
-                    puttok(SyntaxKind.Float);
-                  } else {
-                    puttok(SyntaxKind.Int);
-                  }
-                  break();
-                }
-
-                /* 长整型 */
-                if ((ch == 'L' || ch == 'l') && eoi(reader.peek_next())) {
-                  apptok(ch);
-                  puttok(SyntaxKind.Long);
-                  break();
-                }
-
-                /* 小数 */
-                if (ch == '.') {
-                  apptok(ch);
-                } else {
-                  throw new IllegalSyntaxException(s"语法错误, 行=${reader.line}, 列=${reader.col}");
-                }
-              } else {
-                apptok(ch);
-              }
-            }
-            apptok(ch);
-          }
+          lexnum(ch);
         } else {
           apptok(ch);
         }
