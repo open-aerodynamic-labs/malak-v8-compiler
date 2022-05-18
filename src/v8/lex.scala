@@ -162,6 +162,33 @@ class LexicalAnalysis(val code: String) {
   private def lexnum(exp_ch: Char): Unit = {
     var ch: Char = exp_ch;
     apptok(ch);
+    /**
+      致FUKING SCALA:
+
+          scala是真你妈的沙比，把break和continue给去掉了，换了一个他妈breakable? 尽瞎鸡巴设计，
+        写这个语言的团队是不是没本事处理这个问题啊？使用breakable这么脑瘫的做法也能想出来？
+
+          写到一半我发现这叼语言连你妈break和continue都没有，你妈的breakable和break有什么瘠薄区别。
+        还美名其曰来一句：break和continue本质上和goto差不多。goto是把设计者的妈给杀了吗？这么讨厌goto？
+
+        有本事你tm字节码你别用goto啊，草！
+
+      去你妈的！！！
+
+      --------------------------------------------------------------------------------------
+
+      To FUKING SCALA:
+
+          Scala is a real fucking crap shoot, it's got rid of break and continue and replaced them with a fucking breakable?
+        Is the team that wrote this language incapable of dealing with this problem? How could they even come up with such a stupid idea as using breakable?
+
+          I found out half way through that the language doesn't even have a fucking break or continue, so what's the difference between a fucking breakable and a break?
+        What's the difference between a breakable and a breakable, and a breakable and a continue, which is essentially the same as a goto. You hate goto so much?
+
+        If you're capable of fucking bytecode, don't use goto, damn it!
+
+      Fuck you!!!
+     */
     breakable {
       while (!reader.eof()) {
         ch = reader.look_ahead();
