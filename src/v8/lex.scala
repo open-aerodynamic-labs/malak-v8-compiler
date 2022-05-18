@@ -15,8 +15,9 @@
  */
 package v8
 
-import v8.Token.*
-import v8.LexicalAnalysis.{isspace, v8_make_token}
+import v8.LexicalAnalysis.{eoi, isnumber, isspace, let, make_tok}
+
+import scala.util.control.Breaks.{break, breakable}
 
 /**
  * 源码读取器
@@ -70,34 +71,23 @@ class SourceReader(inputc: String) {
 
 object LexicalAnalysis {
   def main(args: Array[String]): Unit = {
-    var code = "var x = 2;";
+    var code =
+      """
+        |var x: int = 20 + 30 * 2 / 4 - 20 * 2 * 40;
+        |""".stripMargin;
     new LexicalAnalysis(code).lexps();
   }
 
   /** 是不是空格 */
-  def isspace(ch: Char): Boolean =(ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
-
+  inline def isspace(ch: Char): Boolean = (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
   /** 结束符 */
-  def eoi(ch: Char): Boolean = ch == ';';
-
+  inline def eoi(ch: Char): Boolean = ch == ':';
   /** 是不是数字 */
-  def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9';
-
+  inline def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9' || ch == '.';
+  /** 标识符 */
+  inline def let(ch: Char): Boolean = isnumber(ch) || (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_');
   /** 创建tok */
-  def v8_make_token(value: String, kind: TokenKind, line: Int, col: Int): Token = new Token(value, kind, line, col);
-}
-
-object LexicalAnalysisState extends Enumeration {
-  type LexicalAnalysisState = Value
-  val
-  Nop,        // 空状态
-  Plus,       // +
-  PlusEq,     // +=
-  Minus,      // -
-  Star,       // *
-  Slash,      // /
-  Perce,      // %
-  Eof = Value
+  inline def make_tok(value: String, kind: SyntaxKind, line: Int, col: Int): Token = new Token(value, kind, line, col);
 }
 
 /**
@@ -107,41 +97,80 @@ class LexicalAnalysis(val code: String) {
   private var reader = new SourceReader(code);
   private var curtok = new StringBuilder();
   var tokens: List[Token] = listof();
-  var state: LexicalAnalysisState.Value = LexicalAnalysisState.Nop;
 
   /** 追加tok字符 */
   private def apptok(ch: Char): Unit = curtok.append(ch);
 
-  private def puttok(kind: TokenKind): Unit = {
+  /** 自动识别tok类型 */
+  def auto_puttok(ch: Char): Unit = {
+    ch match {
+      case '+' => puttok(SyntaxKind.Plus, '+');
+      case '-' => puttok(SyntaxKind.Minus, '-');
+      case '*' => puttok(SyntaxKind.Star, '*');
+      case '/' => puttok(SyntaxKind.Slash, '/');
+      case '=' => puttok(SyntaxKind.Eq, '=');
+      case _ => { /* 什么都不做 */ }
+    }
+  }
+
+  private def puttok(kind: SyntaxKind): Unit = {
     puttok(kind, curtok.toString())
     curtok.clear();
   };
 
-  private def puttok(kind: TokenKind, ch: Char): Unit = {
+  private def puttok(kind: SyntaxKind, ch: Char): Unit = {
     puttok(kind, String.valueOf(ch));
   }
 
-  private def puttok(kind: TokenKind, value: String): Unit = {
-    tokens.add(v8_make_token(value, kind, reader.line, reader.col));
+  private def puttok(kind: SyntaxKind, value: String): Unit = {
+    tokens.add(make_tok(value, kind, reader.line, reader.col - value.length()));
   }
 
   /** 词法解析 */
   def lexps(): List[Token] = {
-    /* 遍历输入源码 */
+    /** 遍历输入源码 */
     var ch: Char = 0;
     while (!reader.eof()) {
       ch = reader.look_ahead();
+      var spc = isspace(ch);
 
-      /* 开始解析 */
-      if (!isspace(ch)) {
-        ch match {
-          // todo
+      if (!spc && !eoi(ch) && let(ch)) {
+        /** 如果是数字就一直读，读到结束 */
+        if (isnumber(ch)) {
+          apptok(ch);
+          breakable {
+            while (!reader.eof()) {
+              ch = reader.look_ahead();
+              if (!isnumber(ch))
+                break();
+              apptok(ch);
+            }
+          }
+          puttok(SyntaxKind.Number);
+        } else {
+          apptok(ch);
         }
+      } else {
+        /** 添加关键字或者字面量TOKEN */
+        if (curtok.length() > 0) {
+          var tokstr = curtok.toString();
+          tokstr match {
+            case "var" => puttok(SyntaxKind.Var);
+            case "int" => puttok(SyntaxKind.Int);
+            case _ => puttok(SyntaxKind.Identifier);
+          }
+        }
+        /** 添加符号TOKEN */
+        if (!spc && !let(ch) && ch != ';')
+          auto_puttok(ch);
       }
+
+      if (ch == ';')
+        puttok(SyntaxKind.Eoi, ';');
 
     }
 
-    /* 打印 token 列表 */
+    /* 打印 tok 列表 */
     tokens.forEach((tok: Token) => {
       println(tok.toString());
     });
