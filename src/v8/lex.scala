@@ -128,14 +128,28 @@ class LexicalAnalysis(val code: String) {
 
   /** 词法解析 */
   def lexps(): List[Token] = {
-    /** 遍历输入源码 */
-    var ch: Char = 0;
+    /* 遍历输入源码 */
+    var ch:  Char = 0;
+    var spc: Boolean = false;
     while (!reader.eof()) {
-      ch = reader.look_ahead();
-      var spc = isspace(ch);
+      ch  = reader.look_ahead();
+      spc = isspace(ch);
 
+      /**
+       * 这里有几个词需要解释下：
+       *    - eoi eoi（end of identifier）表示用于分割字符但是又不参加到token的解析中来，
+       *          类似空格一样的分隔符。他们的存在就是为了方便把字符分割开。
+       *
+       *          比如: var x: int = 20; 这里的 ':' 就是EOI字符, Ta的作用仅次于把'x'和'int'分开。
+       *
+       *    - let let表示标识符, 标识符的定义是：《 a-z | A-Z | 0-9 | _ | . 》, 大小写字母，数字，下划线，点。
+       *      点是因为它可以作为小数的分隔符， 20.0 这种形式。下划线可以作为变量名的一部分。
+       *
+       *    - spc 是不是空格，space简写成的spc。
+       *
+       */
       if (!spc && !eoi(ch) && let(ch)) {
-        /** 如果是数字就一直读，读到结束 */
+        /* 如果是数字就一直读，读到结束 */
         if (isnumber(ch)) {
           apptok(ch);
           breakable {
@@ -151,7 +165,7 @@ class LexicalAnalysis(val code: String) {
           apptok(ch);
         }
       } else {
-        /** 添加关键字或者字面量TOKEN */
+        /* 添加关键字或者字面量TOKEN */
         if (curtok.length() > 0) {
           var tokstr = curtok.toString();
           tokstr match {
@@ -160,7 +174,7 @@ class LexicalAnalysis(val code: String) {
             case _ => puttok(SyntaxKind.Identifier);
           }
         }
-        /** 添加符号TOKEN */
+        /* 添加符号TOKEN */
         if (!spc && !let(ch) && ch != ';')
           auto_puttok(ch);
       }
