@@ -46,15 +46,15 @@ class SourceReader(inputc: String) {
         line += 1;
         col = 0;
       }
-      case '\t' => {
-        col += 4;
-      }
-      case ' ' =>
+      case '\t' => col += 4;
       case _ => col += 1;
     }
 
     return ch;
   }
+
+  /** 查看下一个字符 */
+  def peek_next(): Char = inputc.charAt(pos);
 
   /** 回退一个字符 */
   def back(): Unit = {
@@ -70,24 +70,56 @@ class SourceReader(inputc: String) {
 }
 
 object LexicalAnalysis {
-  def main(args: Array[String]): Unit = {
-    var code =
-      """
-        |var x: int = 20 + 30 * 2 / 4 - 20 * 2 * 40;
-        |""".stripMargin;
-    new LexicalAnalysis(code).lexps();
-  }
-
+  /** 读到字符 */
+  inline def start_char(ch: Char): Boolean = ch == '\'';
+  /** 读到字符串  */
+  inline def start_string(ch: Char): Boolean = ch == '"';
   /** 是不是空格 */
   inline def isspace(ch: Char): Boolean = (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
-  /** 结束符 */
-  inline def eoi(ch: Char): Boolean = ch == ':';
   /** 是不是数字 */
-  inline def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9' || ch == '.';
+  inline def isnumber(ch: Char): Boolean = ch >= '0' && ch <= '9';
   /** 标识符 */
   inline def let(ch: Char): Boolean = isnumber(ch) || (ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_');
   /** 创建tok */
   inline def make_tok(value: String, kind: SyntaxKind, line: Int, col: Int): Token = new Token(value, kind, line, col);
+  /** 结束符 */
+  inline def eoi(ch: Char): Boolean = {
+      ch match {
+        case   '(' | ')'
+             | '{' | '}'
+             | '[' | ']'
+             | '<' | '>'
+             | ','
+             | ';'
+             | ':'
+             | '='
+             | '+'
+             | '-'
+             | '*'
+             | '/'
+             | '%'
+             | '!'
+             | '&'
+             | '|'
+             | '^'
+             | '~'
+             | '?'
+             | ' '
+             | ';'
+             | '.' => true
+        case _ => false;
+      }
+  }
+
+  def main(args: Array[String]): Unit = {
+    var code =
+      """
+        |var x: int = 80;
+        |var y: long = 80L;
+        |""".stripMargin;
+    new LexicalAnalysis(code).lexps();
+  }
+
 }
 
 /**
@@ -137,10 +169,7 @@ class LexicalAnalysis(val code: String) {
 
       /**
        * 这里有几个词需要解释下：
-       *    - eoi eoi（end of identifier）表示用于分割字符但是又不参加到token的解析中来，
-       *          类似空格一样的分隔符。他们的存在就是为了方便把字符分割开。
-       *
-       *          比如: var x: int = 20; 这里的 ':' 就是EOI字符, Ta的作用仅次于把'x'和'int'分开。
+       *    - eoi eoi（end of identifier）一般是符号，如：=, +, -, *, /, (, ), {, }这些，用于分割字符
        *
        *    - let let表示标识符, 标识符的定义是：《 a-z | A-Z | 0-9 | _ | . 》, 大小写字母，数字，下划线，点。
        *      点是因为它可以作为小数的分隔符， 20.0 这种形式。下划线可以作为变量名的一部分。
@@ -148,19 +177,43 @@ class LexicalAnalysis(val code: String) {
        *    - spc 是不是空格，space简写成的spc。
        *
        */
-      if (!spc && !eoi(ch) && let(ch)) {
+      if (!spc && let(ch)) {
         /* 如果是数字就一直读，读到结束 */
         if (isnumber(ch)) {
           apptok(ch);
           breakable {
             while (!reader.eof()) {
               ch = reader.look_ahead();
-              if (!isnumber(ch))
-                break();
-              apptok(ch);
+              /* 如果不是数字判断是不是'L'或者'l'再或者是不是'.' */
+              if (!isnumber(ch)) {
+                if (eoi(ch)) {
+                  if (curtok.contains('.')) {
+                    puttok(SyntaxKind.Float);
+                  } else {
+                    puttok(SyntaxKind.Int);
+                  }
+                  break();
+                }
+
+                /* 长整型 */
+                if ((ch == 'L' || ch == 'l') && eoi(reader.peek_next())) {
+                  apptok(ch);
+                  puttok(SyntaxKind.Long);
+                  break();
+                }
+
+                /* 小数 */
+                if (ch == '.') {
+                  apptok(ch);
+                } else {
+                  throw new IllegalSyntaxException(s"语法错误, 行=${reader.line}, 列=${reader.col}");
+                }
+              } else {
+                apptok(ch);
+              }
             }
+            apptok(ch);
           }
-          puttok(SyntaxKind.Number);
         } else {
           apptok(ch);
         }
@@ -171,6 +224,10 @@ class LexicalAnalysis(val code: String) {
           tokstr match {
             case "var" => puttok(SyntaxKind.Var);
             case "int" => puttok(SyntaxKind.Int);
+            case "long" => puttok(SyntaxKind.Long);
+            case "float" => puttok(SyntaxKind.Float);
+            case "double" => puttok(SyntaxKind.Double);
+            case "char" => puttok(SyntaxKind.Char);
             case _ => puttok(SyntaxKind.Identifier);
           }
         }

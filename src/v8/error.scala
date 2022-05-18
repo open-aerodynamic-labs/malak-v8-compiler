@@ -15,25 +15,4 @@
  */
 package v8
 
-type SyntaxKind = SyntaxKind.Value
-
-/** tok类别枚举 */
-object SyntaxKind extends Enumeration {
-  val
-
-  /* 关键字 */
-  Var, Char, Int, Long, Float, Double,
-
-  /* 字面量 */
-  Identifier, String, Number,
-
-  /* 操作符 */
-  Eq, Plus, Minus, Star, Slash,
-
-  Eoi, Eof = Value
-}
-
-/** 词法解析器token */
-class Token(val value: String, val kind: SyntaxKind, val line: Int, val col: Int) {
-  override def toString = s"<${kind.toString}, '$value'>"
-}
+class IllegalSyntaxException(message: String) extends RuntimeException(message);
