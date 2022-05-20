@@ -25,7 +25,7 @@ public:
       /** 读取字符串 */
       SourceReader(const std::string &source);
       /** 读取下一个字符 */
-      char look_ahead();
+      bool look_ahead(char *p_ch);
       /** 回退到上一个字符 */
       void back();
       /* 查看下一个字符 */

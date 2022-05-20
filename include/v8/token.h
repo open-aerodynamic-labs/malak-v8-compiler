@@ -23,15 +23,15 @@
  */
 enum tokenkind {
       /* 关键字 */
-      Var, Char, Int, Long, Float, Double,
+      kVar, kChar, kInt, kLong, kFloat, kDouble,
 
       /* 字面量 */
-      Identifier, String, Number,
+      kIdentifier, kString, kNumber,
 
       /* 操作符 */
-      Eq, Plus, Minus, Star, Slash,
+      kEq, kPlus, kMinus, kStar, kSlash,
 
-      Eoi, Eof
+      kEoi, kEof
 };
 
 /**
@@ -45,10 +45,10 @@ struct token {
 };
 
 /** 创建一个token */
-inline static struct token *v8_make_token(std::string &v, enum tokenkind kind, int line, int col);
+inline static struct token *epc_make_token(std::string &v, enum tokenkind kind, int line, int col);
 /** 释放一个token */
-inline static void v8_free_token(struct token *t);
+inline static void epc_free_token(struct token *t);
 /** 打印token */
-inline static void v8_print_token(struct token *t);
+inline static void epc_print_token(struct token *t);
 
 #endif /* __VARUKA_SYNTAX_TOKEN_H__ */

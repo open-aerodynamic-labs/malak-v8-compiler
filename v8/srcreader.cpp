@@ -24,9 +24,10 @@ SourceReader::SourceReader(const std::string &source)
       self_src_size = self_source.size();
 }
 
-char SourceReader::look_ahead()
+bool SourceReader::look_ahead(char *p_ch)
 {
-      if (self_pos < self_src_size) {
+      bool iseof = eof();
+      if (!iseof) {
             char ch = self_source[self_pos];
             self_pos++;
 
@@ -37,10 +38,10 @@ char SourceReader::look_ahead()
                   self_col++;
             }
 
-            return ch;
+            *p_ch = ch;
       }
 
-      return '\0';
+      return iseof;
 }
 
 void SourceReader::back()

@@ -15,7 +15,7 @@
  */
 #include "v8/token.h"
 
-struct token *v8_make_token(std::string &v, enum tokenkind kind, int line, int col)
+struct token *ve_make_token(std::string &v, enum tokenkind kind, int line, int col)
 {
       auto *t = new struct token;
       t->kind = kind;
@@ -25,12 +25,12 @@ struct token *v8_make_token(std::string &v, enum tokenkind kind, int line, int c
       return t;
 }
 
-void v8_free_token(struct token *t)
+void ve_free_token(struct token *t)
 {
       delete t;
 }
 
-void v8_print_token(struct token *t)
+void ve_print_token(struct token *t)
 {
       printf("<%d, %s>\n", t->kind, t->value.c_str());
 }

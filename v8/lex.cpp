@@ -16,13 +16,14 @@
 #include "v8/lex.h"
 #include "srcreader.h"
 
-std::vector<struct token> lexps(std::string &src)
+std::vector<struct token *> lexps(std::string &src)
 {
       SourceReader source_reader{src};
-      std::vector<struct token> tokens;
+      std::vector<struct token *> tokens;
 
-      while(!source_reader.eof()) {
-            printf("%c\n", source_reader.look_ahead());
+      char ch;
+      while(!source_reader.look_ahead(&ch)) {
+
       }
 
       return tokens;
