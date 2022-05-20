@@ -16,6 +16,7 @@
 #ifndef __VARUKA_SOURCE_READER_H__
 #define __VARUKA_SOURCE_READER_H__
 
+#include "v8def.h"
 #include <string>
 
 /** 源码读取器 */
@@ -39,5 +40,23 @@ private:
       std::string self_source;
       size_t      self_src_size;
 };
+
+/** 空格 */
+inline static bool isspace(char c)
+{
+      return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+}
+
+/** 是否是数字 */
+inline static bool isnumber(char c)
+{
+      return c >= '0' && c <= '9';
+}
+
+/** 是否是字符 */
+inline static bool let(char c)
+{
+      return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
 
 #endif /* __VARUKA_SOURCE_READER_H__ */
