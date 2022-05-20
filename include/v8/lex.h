@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,27 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package v8
+#ifndef __VARUKA_LEX_H__
+#define __VARUKA_LEX_H__
 
-type SyntaxKind = SyntaxKind.Value
+#include "v8/token.h"
+#include <vector>
 
-/** tok类别枚举 */
-object SyntaxKind extends Enumeration {
-  val
+std::vector<struct token> lexps(std::string &src);
 
-  /* 关键字 */
-  Var, Char, Int, Long, Float, Double,
-
-  /* 字面量 */
-  Identifier, String, Number,
-
-  /* 操作符 */
-  Eq, Plus, Minus, Star, Slash,
-
-  Eoi, Eof = Value
-}
-
-/** 词法解析器token */
-class Token(val value: String, val kind: SyntaxKind, val line: Int, val col: Int) {
-  override def toString = s"<${kind.toString}, '$value'>"
-}
+#endif /* __VARUKA_LEX_H__ */

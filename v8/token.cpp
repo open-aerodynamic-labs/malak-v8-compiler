@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __V8_STRLIB_H__
-#define __V8_STRLIB_H__
+#include "v8/token.h"
 
-#include "vklib/vkmem.h"
-
-/** 是不是空格 */
-inline static int isspc(char ch)
+struct token *v8_make_token(std::string &v, enum tokenkind kind, int line, int col)
 {
-      return ch == ' ';
+      auto *t = new struct token;
+      t->kind = kind;
+      t->value = v;
+      t->line = line;
+      t->col = col;
+      return t;
 }
 
-/** 字符串比较 */
-inline static int xstrcmp(const char *x, const char *y)
+void v8_free_token(struct token *t)
 {
-      return strcmp(x, y) == 0;
+      delete t;
 }
 
-/** 是不是数字 */
-int isnumber(const char *str);
-/** 字符串替换 */
-void strreplace(char *dest, const char *str, const char *tok, const char *rep);
-
-#endif /* __V8_STRLIB_H__ */
+void v8_print_token(struct token *t)
+{
+      printf("<%d, %s>\n", t->kind, t->value.c_str());
+}
