@@ -18,12 +18,12 @@
 
 std::vector<struct token *> lexps(std::string &src)
 {
-      SourceReader source_reader{src};
-      std::vector<struct token *> tokens;
+      char                          ch;
+      struct token                  tok;
+      SourceReader                  source_reader(src);
+      std::vector<struct token *>   tokens;
 
-      char ch;
       while(!source_reader.look_ahead(&ch)) {
-
       }
 
       return tokens;

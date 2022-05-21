@@ -30,18 +30,15 @@ struct token {
 };
 
 /** 创建一个token */
-inline static struct token *epc_make_token(std::string &v, enum tokenkind kind, int line, int col)
+inline static void epc_make_token(struct token *p_token, std::string &v, enum tokenkind kind,
+                                  int line,
+                                  int col)
 {
-      auto *t = new struct token;
-      t->kind = kind;
-      t->value = v;
-      t->line = line;
-      t->col = col;
-      return t;
+      p_token->kind = kind;
+      p_token->value = v;
+      p_token->line = line;
+      p_token->col = col;
 }
-
-/** 释放一个token */
-#define epc_free_token(p_token) delete p_token
 
 /** 打印token */
 #define epc_print_token(p_token) printf("<%d, %s>\n", p_token->kind, p_token->value.c_str())
