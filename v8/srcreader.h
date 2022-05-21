@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __VARUKA_SOURCE_READER_H__
-#define __VARUKA_SOURCE_READER_H__
+#ifndef __EPOCH_SOURCE_READER_H__
+#define __EPOCH_SOURCE_READER_H__
 
 #include "v8def.h"
 #include <string>
@@ -59,4 +59,4 @@ inline static bool let(char c)
       return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-#endif /* __VARUKA_SOURCE_READER_H__ */
+#endif /* __EPOCH_SOURCE_READER_H__ */

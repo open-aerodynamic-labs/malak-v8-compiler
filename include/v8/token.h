@@ -13,26 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __VARUKA_SYNTAX_TOKEN_H__
-#define __VARUKA_SYNTAX_TOKEN_H__
+#ifndef __EPOCH_SYNTAX_TOKEN_H__
+#define __EPOCH_SYNTAX_TOKEN_H__
 
+#include "tokenkind.h"
 #include <string>
-
-/**
- * token类别
- */
-enum tokenkind {
-      /* 关键字 */
-      kVar, kChar, kInt, kLong, kFloat, kDouble,
-
-      /* 字面量 */
-      kIdentifier, kString, kNumber,
-
-      /* 操作符 */
-      kEq, kPlus, kMinus, kStar, kSlash,
-
-      kEoi, kEof
-};
 
 /**
  * token
@@ -45,10 +30,20 @@ struct token {
 };
 
 /** 创建一个token */
-inline static struct token *epc_make_token(std::string &v, enum tokenkind kind, int line, int col);
-/** 释放一个token */
-inline static void epc_free_token(struct token *t);
-/** 打印token */
-inline static void epc_print_token(struct token *t);
+inline static struct token *epc_make_token(std::string &v, enum tokenkind kind, int line, int col)
+{
+      auto *t = new struct token;
+      t->kind = kind;
+      t->value = v;
+      t->line = line;
+      t->col = col;
+      return t;
+}
 
-#endif /* __VARUKA_SYNTAX_TOKEN_H__ */
+/** 释放一个token */
+#define epc_free_token(p_token) delete p_token
+
+/** 打印token */
+#define epc_print_token(p_token) printf("<%d, %s>\n", p_token->kind, p_token->value.c_str())
+
+#endif /* __EPOCH_SYNTAX_TOKEN_H__ */

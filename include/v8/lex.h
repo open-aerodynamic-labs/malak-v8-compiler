@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __VARUKA_LEX_H__
-#define __VARUKA_LEX_H__
+#ifndef __EPOCH_LEX_H__
+#define __EPOCH_LEX_H__
 
 #include "v8/token.h"
 #include <vector>
 
 std::vector<struct token *> lexps(std::string &src);
 
-#endif /* __VARUKA_LEX_H__ */
+#endif /* __EPOCH_LEX_H__ */

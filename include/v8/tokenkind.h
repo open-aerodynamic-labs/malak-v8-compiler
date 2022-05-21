@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/token.h"
+#ifndef __EPOCH_TOKENKIND_H__
+#define __EPOCH_TOKENKIND_H__
 
-struct token *ve_make_token(std::string &v, enum tokenkind kind, int line, int col)
-{
-      auto *t = new struct token;
-      t->kind = kind;
-      t->value = v;
-      t->line = line;
-      t->col = col;
-      return t;
-}
+/**
+ * token类别
+ */
+enum tokenkind {
+      /* 关键字 */
+      kVar, kChar, kInt, kLong, kFloat, kDouble,
 
-void ve_free_token(struct token *t)
-{
-      delete t;
-}
+      /* 字面量 */
+      kIdentifier, kString, kNumber,
 
-void ve_print_token(struct token *t)
-{
-      printf("<%d, %s>\n", t->kind, t->value.c_str());
-}
+      /* 操作符 */
+      kEq, kPlus, kMinus, kStar, kSlash,
+
+      kEoi, kEof
+};
+
+#endif /* __EPOCH_TOKENKIND_H__ */
