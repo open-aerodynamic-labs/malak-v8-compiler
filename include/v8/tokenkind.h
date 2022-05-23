@@ -34,6 +34,7 @@
 #define KIND_EOI                     16
 #define KIND_EOF                     17
 #define KIND_SPACE                   18
+#define KIND_STRING_LITERAL          19
 
 typedef unsigned tokenkind_t;
 

@@ -35,9 +35,11 @@ typedef std::map<char, f_lexc>            eoimap_t;
 /**
  * 解析阶段
  */
-#define PHASE_DONE    0
-#define PHASE_INTEGER 1
-#define PHASE_DECIMAL 2
+#define PHASE_NOP        -1
+#define PHASE_DONE        0
+#define PHASE_INTEGER     1
+#define PHASE_DECIMAL     2
+#define PHASE_BACKSLASH   3
 
 /** 初始化词法MAP */
 void init_lexc_map(lexmap_t *map)
@@ -48,6 +50,7 @@ void init_lexc_map(lexmap_t *map)
       epc_add_lexc(map, "long", KIND_LONG);
       epc_add_lexc(map, "float", KIND_FLOAT);
       epc_add_lexc(map, "double", KIND_DOUBLE);
+      epc_add_lexc(map, "string", KIND_STRING);
 }
 
 /** 初始化符号MAP */
@@ -150,6 +153,56 @@ FLAG_THROW_INVALID_NUMBER:
 }
 
 /**
+ * 读取到字符串
+ *
+ * @param ch        第一个符号
+ * @param reader    读取器
+ * @param line      行号
+ * @param col       列号
+ * @return          读取到的字符串
+ */
+std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
+{
+      std::stringstream       buf;
+      std::string             buftok;
+      int                     strline = *line;
+
+      buf << ch;
+
+      int phase = PHASE_NOP;
+      while(!reader.look_ahead(&ch, line, col)) {
+            if (*line > strline)
+                  epc_throw_error("lexc error: string too long;", *line, *col);
+
+            if (ch != '"') {
+                  if (ch == '\\') {
+                        phase = PHASE_BACKSLASH;
+                  } else {
+                        phase = PHASE_NOP;
+                  }
+
+                  buf << ch;
+                  continue;
+            } else {
+                  // 如果是反斜杠，那么就是转义字符。加入到字符串中，继续扫描。
+                  if (phase == PHASE_BACKSLASH) {
+                        buf << ch;
+                        phase = PHASE_NOP;
+                        continue;
+                  }
+
+                  buf << ch;
+                  buftok = buf.str();
+                  return buftok;
+            }
+
+      }
+
+      epc_throw_error("lexc error: string not closed;", *line, *col);
+      return "do nothing for return";
+}
+
+/**
  * 开始对源码做词法分析
  *
  * @param src     源码
@@ -210,6 +263,13 @@ std::vector<struct token> epc_run_lexc(std::string &src)
                         }
                   }
 
+                  continue;
+            }
+
+            /* 读取到string */
+            if (ch == '"') {
+                  buftok = lexc_read_string(ch, reader, &line, &col);
+                  epc_push_token(buftok, KIND_STRING_LITERAL);
                   continue;
             }
 
