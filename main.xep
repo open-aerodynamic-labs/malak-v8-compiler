@@ -1,3 +1,20 @@
+class source_reader
+{
+    var source: string;
+    var pos: int;
+
+    fun source_reader(source: string) {
+        this.source = source;
+    }
+
+    fun look_ahead() {
+        var ch: char = this.source[pos];
+        ++pos;
+        return ch;
+    }
+
+}
+
 fun main(argc: int, varargs args: string) {
     var fmt: char = 'a';
 }

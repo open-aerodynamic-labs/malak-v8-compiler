@@ -31,6 +31,7 @@
 #define KIND_ANY                      1009
 #define KIND_RETURN                   1010
 #define KIND_GOTO                     1011
+#define KIND_THIS                     1012
 
 /* 字面量 */
 #define KIND_IDENTIFIER               2001
@@ -50,6 +51,9 @@
 #define KIND_OPEN_BRACE               3008
 #define KIND_CLOSE_BRACE              3009
 #define KIND_DOT                      3010
+#define KIND_COMMA                    3011
+#define KIND_OPEN_BRACKET             3012
+#define KIND_CLOSE_BRACKET            3013
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1

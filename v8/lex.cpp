@@ -71,11 +71,14 @@ void init_eoic_map(eoimap_t *map)
       epc_add_lexc(map, '/', KIND_SLASH);
       epc_add_lexc(map, ';', KIND_EOI);
       epc_add_lexc(map, ':', KIND_NOP);
-      epc_add_lexc(map, ',', KIND_DOT);
+      epc_add_lexc(map, '.', KIND_DOT);
+      epc_add_lexc(map, ',', KIND_COMMA);
       epc_add_lexc(map, '(', KIND_OPEN_PAREN);
       epc_add_lexc(map, ')', KIND_CLOSE_PAREN);
       epc_add_lexc(map, '{', KIND_OPEN_BRACE);
       epc_add_lexc(map, '}', KIND_CLOSE_BRACE);
+      epc_add_lexc(map, '[', KIND_OPEN_BRACKET);
+      epc_add_lexc(map, ']', KIND_CLOSE_BRACKET);
       epc_add_lexc(map, '\0', KIND_EOF);
 }
 
