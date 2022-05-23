@@ -16,5 +16,5 @@ object source_reader
 }
 
 fun main(argc: int, varargs args: string) {
-    var fmt: char = 'a';
+    var reader: object source_reader();
 }

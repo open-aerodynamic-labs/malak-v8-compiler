@@ -55,6 +55,7 @@
 #define KIND_COMMA                    3011
 #define KIND_OPEN_BRACKET             3012
 #define KIND_CLOSE_BRACKET            3013
+#define KIND_COLON                    3014
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1

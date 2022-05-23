@@ -72,7 +72,6 @@ void init_eoic_map(eoimap_t *map)
       xep_add_lexc(map, '*', KIND_STAR);
       xep_add_lexc(map, '/', KIND_SLASH);
       xep_add_lexc(map, ';', KIND_EOI);
-      xep_add_lexc(map, ':', KIND_NOP);
       xep_add_lexc(map, '.', KIND_DOT);
       xep_add_lexc(map, ',', KIND_COMMA);
       xep_add_lexc(map, '(', KIND_OPEN_PAREN);
@@ -81,6 +80,7 @@ void init_eoic_map(eoimap_t *map)
       xep_add_lexc(map, '}', KIND_CLOSE_BRACE);
       xep_add_lexc(map, '[', KIND_OPEN_BRACKET);
       xep_add_lexc(map, ']', KIND_CLOSE_BRACKET);
+      xep_add_lexc(map, ':', KIND_COLON);
       xep_add_lexc(map, '\0', KIND_EOF);
 }
 
