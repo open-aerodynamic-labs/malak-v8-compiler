@@ -26,8 +26,8 @@
 #define KIND_STRING                   8
 #define KIND_NUMBER                   9
 #define KIND_EQ                      10
-#define KIND_PLUS                    11
-#define KIND_MINUS                   12
+#define KIND_ADD                     11
+#define KIND_SUB                     12
 #define KIND_STAR                    13
 #define KIND_SLASH                   14
 #define KIND_UNKNOWN                 15

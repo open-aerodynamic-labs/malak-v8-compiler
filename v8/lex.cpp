@@ -20,7 +20,7 @@
 
 #define clearbuf(x) x.str("")
 
-/** 词法解析回调函数，获取当前tokenkind */
+/** 词法解析回调函数，获取当前token kind */
 typedef void (*f_lexc)(tokenkind_t *);
 
 /**
@@ -34,28 +34,30 @@ typedef std::map<std::string, f_lexc> lexmap;
  */
 typedef std::map<char, f_lexc> eoimap;
 
-/** 初始化词法解析器map */
+#define epc_add_lexc(map, key, kind) (map)->insert(std::make_pair(key, [](tokenkind_t *tk) { *tk = kind; }))
+
+/** 初始化词法MAP */
 void init_lexc_map(lexmap *map)
 {
-      map->insert(std::make_pair("var", [](tokenkind_t *tk) { *tk = KIND_VAR; }));
-      map->insert(std::make_pair("char", [](tokenkind_t *tk) { *tk = KIND_CHAR; }));
-      map->insert(std::make_pair("int", [](tokenkind_t *tk) { *tk = KIND_INT; }));
-      map->insert(std::make_pair("long", [](tokenkind_t *tk) { *tk = KIND_LONG; }));
-      map->insert(std::make_pair("float", [](tokenkind_t *tk) { *tk = KIND_FLOAT; }));
-      map->insert(std::make_pair("double", [](tokenkind_t *tk) { *tk = KIND_DOUBLE; }));
+      epc_add_lexc(map, "var", KIND_VAR);
+      epc_add_lexc(map, "char", KIND_CHAR);
+      epc_add_lexc(map, "int", KIND_INT);
+      epc_add_lexc(map, "long", KIND_LONG);
+      epc_add_lexc(map, "float", KIND_FLOAT);
+      epc_add_lexc(map, "double", KIND_DOUBLE);
 }
 
-/** 初始化eoi符号解析器map */
+/** 初始化符号MAP */
 void init_eoic_map(eoimap *map)
 {
-      map->insert(std::make_pair('=', [](tokenkind_t *tk) { *tk = KIND_EQ; }));
-      map->insert(std::make_pair('+', [](tokenkind_t *tk) { *tk = KIND_PLUS; }));
-      map->insert(std::make_pair('-', [](tokenkind_t *tk) { *tk = KIND_MINUS; }));
-      map->insert(std::make_pair('*', [](tokenkind_t *tk) { *tk = KIND_STAR; }));
-      map->insert(std::make_pair('/', [](tokenkind_t *tk) { *tk = KIND_SLASH; }));
-      map->insert(std::make_pair(';', [](tokenkind_t *tk) { *tk = KIND_EOI; }));
-      map->insert(std::make_pair(':', [](tokenkind_t *tk) { *tk = KIND_UNKNOWN; }));
-      map->insert(std::make_pair('\0', [](tokenkind_t *tk) { *tk = KIND_EOF; }));
+      epc_add_lexc(map, '=', KIND_EQ);
+      epc_add_lexc(map, '+', KIND_ADD);
+      epc_add_lexc(map, '-', KIND_SUB);
+      epc_add_lexc(map, '*', KIND_STAR);
+      epc_add_lexc(map, '/', KIND_SLASH);
+      epc_add_lexc(map, ';', KIND_EOI);
+      epc_add_lexc(map, ':', KIND_UNKNOWN);
+      epc_add_lexc(map, '\0', KIND_EOF);
 }
 
 /**
@@ -74,7 +76,7 @@ std::vector<struct token> lexps(std::string &src)
       eoimap                        eoic;
       tokenkind_t                   tokenkind;
 
-      /* 初始化词法解析器map */
+      /* 初始化词法MAP */
       init_lexc_map(&lexc);
       init_eoic_map(&eoic);
 
@@ -112,6 +114,11 @@ std::vector<struct token> lexps(std::string &src)
                   }
 
                   clearbuf(buf);
+                  continue;
+            }
+
+            /* 读到数字 */
+            if (isnumber(ch) && buf.str().length() == 0) {
                   continue;
             }
 
