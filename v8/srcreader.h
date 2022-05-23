@@ -25,7 +25,7 @@ public:
       /** 读取字符串 */
       SourceReader(const std::string &source);
       /** 读取下一个字符 */
-      bool look_ahead(char *p_ch);
+      bool look_ahead(char *p_ch, int *p_line, int *p_col);
       /** 回退到上一个字符 */
       void back();
       /* 查看下一个字符 */
@@ -45,6 +45,15 @@ private:
 inline static bool isspace(char c)
 {
       return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+}
+
+/** 结束符 */
+inline static bool iseoi(char c)
+{
+      return c == ';'
+      || c == ':'
+      || c == '='
+      || c == '\0';
 }
 
 /** 是否是数字 */

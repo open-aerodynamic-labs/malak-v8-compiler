@@ -16,20 +16,24 @@
 #ifndef __EPOCH_TOKENKIND_H__
 #define __EPOCH_TOKENKIND_H__
 
-/**
- * token类别
- */
-enum tokenkind {
-      /* 关键字 */
-      kVar, kChar, kInt, kLong, kFloat, kDouble,
+#define KIND_VAR                      1
+#define KIND_CHAR                     2
+#define KIND_INT                      3
+#define KIND_LONG                     4
+#define KIND_FLOAT                    5
+#define KIND_DOUBLE                   6
+#define KIND_IDENTIFIER               7
+#define KIND_STRING                   8
+#define KIND_NUMBER                   9
+#define KIND_EQ                      10
+#define KIND_PLUS                    11
+#define KIND_MINUS                   12
+#define KIND_STAR                    13
+#define KIND_SLASH                   14
+#define KIND_UNKNOWN                 15
+#define KIND_EOI                     16
+#define KIND_EOF                     17
 
-      /* 字面量 */
-      kIdentifier, kString, kNumber,
-
-      /* 操作符 */
-      kEq, kPlus, kMinus, kStar, kSlash,
-
-      kEoi, kEof
-};
+typedef unsigned tokenkind_t;
 
 #endif /* __EPOCH_TOKENKIND_H__ */

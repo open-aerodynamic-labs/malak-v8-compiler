@@ -23,14 +23,14 @@
  * token
  */
 struct token {
-      enum tokenkind kind;
+      tokenkind_t kind;
       std::string value;
       int line;
       int col;
 };
 
 /** 创建一个token */
-inline static void epc_make_token(struct token *p_token, std::string &v, enum tokenkind kind,
+inline static void epc_make_token(struct token *p_token, std::string &v, tokenkind_t kind,
                                   int line,
                                   int col)
 {
@@ -40,7 +40,36 @@ inline static void epc_make_token(struct token *p_token, std::string &v, enum to
       p_token->col = col;
 }
 
+/**
+ * 添加符号token
+ * @return true表示是一个有用的符号，false表示是一个无用的符号
+ */
+inline static bool epc_make_eoitok(struct token *p_token, char ch, int line, int col)
+{
+      // char 转 std::string
+      std::string tokvalue;
+      tokvalue.push_back(ch);
+
+      tokenkind_t tokenkind;
+
+      switch (ch) {
+            case '=': {
+                  tokenkind = KIND_EQ;
+                  goto FLAG_EPC_MAKE_EOITOK_END;
+            }
+            case ';': {
+                  tokenkind = KIND_EOF;
+                  goto FLAG_EPC_MAKE_EOITOK_END;
+            }
+            default: return false;
+      }
+
+FLAG_EPC_MAKE_EOITOK_END:
+      epc_make_token(p_token, tokvalue, tokenkind, line, col);
+      return true;
+}
+
 /** 打印token */
-#define epc_print_token(p_token) printf("<%d, %s>\n", p_token->kind, p_token->value.c_str())
+#define epc_print_token(p_token) printf("<%d, %s>\n", (p_token).kind, (p_token).value.c_str())
 
 #endif /* __EPOCH_SYNTAX_TOKEN_H__ */
