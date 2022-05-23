@@ -46,7 +46,7 @@ bool SourceReader::look_ahead(char *p_ch, int *p_line, int *p_col)
       return iseof;
 }
 
-void SourceReader::back()
+void SourceReader::back(int *p_line, int *p_col)
 {
       if (self_pos > 0) {
             self_pos--;
@@ -59,6 +59,9 @@ void SourceReader::back()
                   self_col--;
             }
       }
+
+      *p_line = self_line;
+      *p_col = self_col;
 }
 
 const bool SourceReader::eof()
@@ -69,7 +72,7 @@ const bool SourceReader::eof()
 char SourceReader::peek_next()
 {
       if (self_pos < self_src_size) {
-            return self_source[self_pos + 1];
+            return self_source[self_pos];
       }
 
       return '\0';

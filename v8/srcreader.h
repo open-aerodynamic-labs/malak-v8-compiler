@@ -27,7 +27,7 @@ public:
       /** 读取下一个字符 */
       bool look_ahead(char *p_ch, int *p_line, int *p_col);
       /** 回退到上一个字符 */
-      void back();
+      void back(int *p_line, int *p_col);
       /* 查看下一个字符 */
       char peek_next();
       /** 是否读到文件末尾 */
@@ -50,7 +50,7 @@ inline static bool isspace(char c)
 /** 是否是数字 */
 inline static bool isnumber(char c)
 {
-      return c >= '0' && c <= '9';
+      return (c >= '0' && c <= '9');
 }
 
 /** 是否是字符 */

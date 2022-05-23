@@ -30,9 +30,10 @@
 #define KIND_SUB                     12
 #define KIND_STAR                    13
 #define KIND_SLASH                   14
-#define KIND_UNKNOWN                 15
+#define KIND_NOP                     15
 #define KIND_EOI                     16
 #define KIND_EOF                     17
+#define KIND_SPACE                   18
 
 typedef unsigned tokenkind_t;
 
