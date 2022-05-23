@@ -72,7 +72,7 @@ struct token {
 };
 
 /** 创建一个token */
-inline static void epc_make_token(struct token *p_token, std::string &v, tokenkind_t kind,
+inline static void xep_make_token(struct token *p_token, std::string &v, tokenkind_t kind,
                                   int line,
                                   int col)
 {
@@ -85,7 +85,7 @@ inline static void epc_make_token(struct token *p_token, std::string &v, tokenki
 /**
  * 抛出异常
  */
-inline static void epc_throw_error(std::string fmt, int line, int col, ...)
+inline static void xep_throw_error(std::string fmt, int line, int col, ...)
 {
       fmt = fmt + " (line=%d, col=%d)\n";
       char buf[512];
@@ -94,6 +94,6 @@ inline static void epc_throw_error(std::string fmt, int line, int col, ...)
 }
 
 /** 打印token */
-#define epc_print_token(p_token) printf("<%d, %s>\n", (p_token).kind, (p_token).value.c_str())
+#define xep_print_token(p_token) printf("<%d, %s>\n", (p_token).kind, (p_token).value.c_str())
 
 #endif /* __EPOCH_SYNTAX_TOKEN_H__ */

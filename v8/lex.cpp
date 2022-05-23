@@ -32,7 +32,7 @@ typedef void (*f_lexc)(tokenkind_t *);
 typedef std::map<std::string, f_lexc>     lexmap_t;
 typedef std::map<char, f_lexc>            eoimap_t;
 
-#define epc_add_lexc(map, key, kind) (map)->insert(std::make_pair(key, [](tokenkind_t *tk) { *tk = kind; }))
+#define xep_add_lexc(map, key, kind) (map)->insert(std::make_pair(key, [](tokenkind_t *tk) { *tk = kind; }))
 
 /**
  * 解析阶段
@@ -46,40 +46,40 @@ typedef std::map<char, f_lexc>            eoimap_t;
 /** 初始化词法MAP */
 void init_lexc_map(lexmap_t *map)
 {
-      epc_add_lexc(map, "var", KIND_VAR);
-      epc_add_lexc(map, "char", KIND_CHAR);
-      epc_add_lexc(map, "int", KIND_INT);
-      epc_add_lexc(map, "long", KIND_LONG);
-      epc_add_lexc(map, "float", KIND_FLOAT);
-      epc_add_lexc(map, "double", KIND_DOUBLE);
-      epc_add_lexc(map, "string", KIND_STRING);
-      epc_add_lexc(map, "fun", KIND_FUN);
-      epc_add_lexc(map, "varargs", KIND_VARARGS);
-      epc_add_lexc(map, "any", KIND_ANY);
-      epc_add_lexc(map, "return", KIND_RETURN);
-      epc_add_lexc(map, "goto", KIND_GOTO);
+      xep_add_lexc(map, "var", KIND_VAR);
+      xep_add_lexc(map, "char", KIND_CHAR);
+      xep_add_lexc(map, "int", KIND_INT);
+      xep_add_lexc(map, "long", KIND_LONG);
+      xep_add_lexc(map, "float", KIND_FLOAT);
+      xep_add_lexc(map, "double", KIND_DOUBLE);
+      xep_add_lexc(map, "string", KIND_STRING);
+      xep_add_lexc(map, "fun", KIND_FUN);
+      xep_add_lexc(map, "varargs", KIND_VARARGS);
+      xep_add_lexc(map, "any", KIND_ANY);
+      xep_add_lexc(map, "return", KIND_RETURN);
+      xep_add_lexc(map, "goto", KIND_GOTO);
 }
 
 /** 初始化符号MAP */
 void init_eoic_map(eoimap_t *map)
 {
-      epc_add_lexc(map, ' ', KIND_NOP);
-      epc_add_lexc(map, '=', KIND_EQ);
-      epc_add_lexc(map, '+', KIND_ADD);
-      epc_add_lexc(map, '-', KIND_SUB);
-      epc_add_lexc(map, '*', KIND_STAR);
-      epc_add_lexc(map, '/', KIND_SLASH);
-      epc_add_lexc(map, ';', KIND_EOI);
-      epc_add_lexc(map, ':', KIND_NOP);
-      epc_add_lexc(map, '.', KIND_DOT);
-      epc_add_lexc(map, ',', KIND_COMMA);
-      epc_add_lexc(map, '(', KIND_OPEN_PAREN);
-      epc_add_lexc(map, ')', KIND_CLOSE_PAREN);
-      epc_add_lexc(map, '{', KIND_OPEN_BRACE);
-      epc_add_lexc(map, '}', KIND_CLOSE_BRACE);
-      epc_add_lexc(map, '[', KIND_OPEN_BRACKET);
-      epc_add_lexc(map, ']', KIND_CLOSE_BRACKET);
-      epc_add_lexc(map, '\0', KIND_EOF);
+      xep_add_lexc(map, ' ', KIND_NOP);
+      xep_add_lexc(map, '=', KIND_EQ);
+      xep_add_lexc(map, '+', KIND_ADD);
+      xep_add_lexc(map, '-', KIND_SUB);
+      xep_add_lexc(map, '*', KIND_STAR);
+      xep_add_lexc(map, '/', KIND_SLASH);
+      xep_add_lexc(map, ';', KIND_EOI);
+      xep_add_lexc(map, ':', KIND_NOP);
+      xep_add_lexc(map, '.', KIND_DOT);
+      xep_add_lexc(map, ',', KIND_COMMA);
+      xep_add_lexc(map, '(', KIND_OPEN_PAREN);
+      xep_add_lexc(map, ')', KIND_CLOSE_PAREN);
+      xep_add_lexc(map, '{', KIND_OPEN_BRACE);
+      xep_add_lexc(map, '}', KIND_CLOSE_BRACE);
+      xep_add_lexc(map, '[', KIND_OPEN_BRACKET);
+      xep_add_lexc(map, ']', KIND_CLOSE_BRACKET);
+      xep_add_lexc(map, '\0', KIND_EOF);
 }
 
 /**
@@ -163,7 +163,7 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
       }
 
 FLAG_THROW_INVALID_NUMBER:
-      epc_throw_error("lexc error: invalid number;", *line, *col);
+      xep_throw_error("lexc error: invalid number;", *line, *col);
       __INVALID_RETURN_STRING__();
 }
 
@@ -186,7 +186,7 @@ std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
       int phase = PHASE_NOP;
       while(!reader.look_ahead(&ch, line, col)) {
             if (*line > strline)
-                  epc_throw_error("lexc error: string too long;", *line, *col);
+                  xep_throw_error("lexc error: string too long;", *line, *col);
 
             if (ch != '"') {
                   if (ch == '\\') {
@@ -211,7 +211,7 @@ std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
 
       }
 
-      epc_throw_error("lexc error: string not closed;", *line, *col);
+      xep_throw_error("lexc error: string not closed;", *line, *col);
       __INVALID_RETURN_STRING__();
 }
 
@@ -279,7 +279,7 @@ std::string lexc_read_character(char ch, SourceReader &reader, int *line, int *c
 FLAG_INVALID_CHARACTER:
       char xnbuf[512];
       snprintf(xnbuf, sizeof(xnbuf), "lexc error: invalid character %s;", buf.str().c_str());
-      epc_throw_error(xnbuf, *line, *col);
+      xep_throw_error(xnbuf, *line, *col);
       __INVALID_RETURN_STRING__();
 }
 
@@ -289,7 +289,7 @@ FLAG_INVALID_CHARACTER:
  * @param src     源码
  * @return        词法分析结果
  */
-std::vector<struct token> epc_run_lexc(std::string &src)
+std::vector<struct token> xep_run_lexc(std::string &src)
 {
       char                          ch;
       std::stringstream             buf;
@@ -308,8 +308,8 @@ std::vector<struct token> epc_run_lexc(std::string &src)
       init_eoic_map(&eoimap);
 
       /* 添加token方法 */
-#define epc_push_token(strtok, kind)                              \
-      epc_make_token(&tok, strtok, kind, line, col);              \
+#define xep_push_token(strtok, kind)                              \
+      xep_make_token(&tok, strtok, kind, line, col);              \
       tokens.push_back(tok);                                      \
       buftok.clear();                                             \
       clearbuf(buf);                                              \
@@ -331,7 +331,7 @@ std::vector<struct token> epc_run_lexc(std::string &src)
                               tokenkind = KIND_IDENTIFIER;
                         }
 
-                        epc_push_token(buftok, tokenkind);
+                        xep_push_token(buftok, tokenkind);
                   }
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
@@ -340,7 +340,7 @@ std::vector<struct token> epc_run_lexc(std::string &src)
                         eoimap[ch](&tokenkind);
 
                         if (tokenkind != KIND_NOP) {
-                              epc_push_token(buftok, tokenkind);
+                              xep_push_token(buftok, tokenkind);
                         }
                   }
 
@@ -350,21 +350,21 @@ std::vector<struct token> epc_run_lexc(std::string &src)
             /* 读到char */
             if (ch == '\'') {
                   buftok = lexc_read_character(ch, reader, &line, &col);
-                  epc_push_token(buftok, KIND_CHARACTER_LITERAL);
+                  xep_push_token(buftok, KIND_CHARACTER_LITERAL);
                   continue;
             }
 
             /* 读取到string */
             if (ch == '"') {
                   buftok = lexc_read_string(ch, reader, &line, &col);
-                  epc_push_token(buftok, KIND_STRING_LITERAL);
+                  xep_push_token(buftok, KIND_STRING_LITERAL);
                   continue;
             }
 
             /* 读到数字, 就一直循环往下读。知道读取到的内容不是数字为止 */
             if (isnumber(ch) && buf.str().length() == 0) {
                   buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
-                  epc_push_token(buftok, KIND_NUMBER);
+                  xep_push_token(buftok, KIND_NUMBER);
                   continue;
             }
 
@@ -373,7 +373,7 @@ std::vector<struct token> epc_run_lexc(std::string &src)
 
       /* 遍历token */
       for (auto &itok : tokens) {
-            epc_print_token(itok);
+            xep_print_token(itok);
       }
 
       return tokens;

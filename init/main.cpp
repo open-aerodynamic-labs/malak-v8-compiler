@@ -24,7 +24,7 @@ int main()
                           (std::istreambuf_iterator<char>()));
       ifs.close();
 
-      epc_run_lexc(source);
+      xep_run_lexc(source);
 
       return 0;
 }
