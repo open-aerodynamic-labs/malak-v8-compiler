@@ -31,7 +31,8 @@
 #define KIND_ANY                      1009
 #define KIND_RETURN                   1010
 #define KIND_GOTO                     1011
-#define KIND_THIS                     1012
+#define KIND_OBJECT                   1012
+#define KIND_THIS                     1013
 
 /* 字面量 */
 #define KIND_IDENTIFIER               2001

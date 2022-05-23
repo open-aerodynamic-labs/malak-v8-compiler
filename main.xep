@@ -1,4 +1,4 @@
-class source_reader
+object source_reader
 {
     var source: string;
     var pos: int;

@@ -58,6 +58,8 @@ void init_lexc_map(lexmap_t *map)
       xep_add_lexc(map, "any", KIND_ANY);
       xep_add_lexc(map, "return", KIND_RETURN);
       xep_add_lexc(map, "goto", KIND_GOTO);
+      xep_add_lexc(map, "object", KIND_OBJECT);
+      xep_add_lexc(map, "this", KIND_THIS);
 }
 
 /** 初始化符号MAP */
