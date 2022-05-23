@@ -20,6 +20,8 @@
 
 #define clearbuf(x) x.str("")
 
+#define __INVALID_RETURN_STRING__() return ""
+
 /** 词法解析回调函数，获取当前token kind */
 typedef void (*f_lexc)(tokenkind_t *);
 
@@ -149,7 +151,7 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
 
 FLAG_THROW_INVALID_NUMBER:
       epc_throw_error("lexc error: invalid number;", *line, *col);
-      return "do nothing for return";
+      __INVALID_RETURN_STRING__();
 }
 
 /**
@@ -164,7 +166,6 @@ FLAG_THROW_INVALID_NUMBER:
 std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
 {
       std::stringstream       buf;
-      std::string             buftok;
       int                     strline = *line;
 
       buf << ch;
@@ -192,14 +193,81 @@ std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
                   }
 
                   buf << ch;
-                  buftok = buf.str();
-                  return buftok;
+                  return buf.str();
             }
 
       }
 
       epc_throw_error("lexc error: string not closed;", *line, *col);
-      return "do nothing for return";
+      __INVALID_RETURN_STRING__();
+}
+
+/**
+ * 读取到字符
+ *
+ * @param ch        第一个符号
+ * @param reader    读取器
+ * @param line      行号
+ * @param col       列号
+ * @return          读取到的字符串
+ */
+std::string lexc_read_character(char ch, SourceReader &reader, int *line, int *col)
+{
+      std::stringstream       buf;
+
+      buf << ch;
+
+      // 读取字符内容
+      reader.look_ahead(&ch, line, col);
+      buf << ch;
+
+      /*
+       * 如果读取到下划线，那么就是转义字符。它的转义字符有:
+       *    \n  换行
+       *    \r  回车
+       *    \t  水平制表符
+       *    \b  退格
+       *    \f  换页
+       *    \\  反斜杠
+       *    \'  单引号
+       *
+       */
+      if (ch == '\\') {
+            reader.look_ahead(&ch, line, col);
+            buf << ch;
+
+            // 这里只是为了做异常处理，而判断的
+            switch (ch) {
+                  case 'a':
+                  case 'n':
+                  case 'r':
+                  case 't':
+                  case 'b':
+                  case 'f':
+                  case '\\':
+                  case '\'': {
+                        reader.look_ahead(&ch, line, col); // 再往下读一个字符，拿到最后的结束符号
+                        break;
+                  }
+
+                  /* 非法字符 */
+                  default: goto FLAG_INVALID_CHARACTER;
+            }
+      } else {
+            reader.look_ahead(&ch, line, col);
+      }
+
+      // 这个字符必须是单引号，否则报错
+      if (ch == '\'') {
+            buf << ch;
+            return buf.str();
+      }
+
+FLAG_INVALID_CHARACTER:
+      char xnbuf[512];
+      snprintf(xnbuf, sizeof(xnbuf), "lexc error: invalid character %s;", buf.str().c_str());
+      epc_throw_error(xnbuf, *line, *col);
+      __INVALID_RETURN_STRING__();
 }
 
 /**
@@ -263,6 +331,13 @@ std::vector<struct token> epc_run_lexc(std::string &src)
                         }
                   }
 
+                  continue;
+            }
+
+            /* 读到char */
+            if (ch == '\'') {
+                  buftok = lexc_read_character(ch, reader, &line, &col);
+                  epc_push_token(buftok, KIND_CHARACTER_LITERAL);
                   continue;
             }
 

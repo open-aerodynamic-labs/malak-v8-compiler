@@ -44,7 +44,7 @@ inline static void epc_make_token(struct token *p_token, std::string &v, tokenki
 /**
  * 抛出异常
  */
-inline static void epc_throw_error(std::string fmt, int line, int col)
+inline static void epc_throw_error(std::string fmt, int line, int col, ...)
 {
       fmt = fmt + " (line=%d, col=%d)\n";
       char buf[512];

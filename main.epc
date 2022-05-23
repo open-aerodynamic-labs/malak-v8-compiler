@@ -1,5 +1,1 @@
-var x: float = 20.0f;
-var y: float = 20.0f;
-var z: float = x + y - 1.0f;
-
-var name: string = "hell world";
+var ch: char = '\a';
