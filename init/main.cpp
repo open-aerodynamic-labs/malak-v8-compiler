@@ -17,7 +17,9 @@
 
 int main()
 {
-      std::string source = "var x: int = 0;";
+      std::string source = "var x: int = 0;"
+                           "var y: int = 1;"
+                           "var z: int = x + y;";
       lexps(source);
       return 0;
 }

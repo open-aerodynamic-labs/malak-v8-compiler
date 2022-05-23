@@ -47,15 +47,6 @@ inline static bool isspace(char c)
       return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
 
-/** 结束符 */
-inline static bool iseoi(char c)
-{
-      return c == ';'
-      || c == ':'
-      || c == '='
-      || c == '\0';
-}
-
 /** 是否是数字 */
 inline static bool isnumber(char c)
 {
