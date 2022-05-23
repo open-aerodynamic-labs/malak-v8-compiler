@@ -80,13 +80,14 @@ std::vector<struct token> lexps(std::string &src)
 
       /* 循环读入字符 */
       while (!source_reader.look_ahead(&ch, &line, &col)) {
-            bool contains_eoi = eoic.count(ch) > 0;
-            if (isspace(ch) || contains_eoi) {
+            // 判断是否是eoi符号
+            bool __exist_eoi = eoic.count(ch) > 0;
+
+            if (isspace(ch) || __exist_eoi) {
                   auto buftok = buf.str();
 
                   // 如果是空格或者结束符，则认为是结束。添加当前缓存内容到token列表
                   if (buftok.length() > 0) {
-
                         if (lexc.count(buftok)) {
                               lexc[buftok](&tokenkind);
                         } else {
@@ -98,14 +99,16 @@ std::vector<struct token> lexps(std::string &src)
                   }
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
-                  if (contains_eoi) {
+                  if (__exist_eoi) {
                         std::string v;
                         v.push_back(ch);
 
                         eoic[ch](&tokenkind);
 
-                        epc_make_token(&tok, v, tokenkind, line, col);
-                        tokens.push_back(tok);
+                        if (tokenkind != KIND_UNKNOWN) {
+                              epc_make_token(&tok, v, tokenkind, line, col);
+                              tokens.push_back(tok);
+                        }
                   }
 
                   clearbuf(buf);
@@ -115,6 +118,7 @@ std::vector<struct token> lexps(std::string &src)
             buf << ch;
       }
 
+      /* 遍历token */
       for (auto &itok : tokens) {
             epc_print_token(itok);
       }
