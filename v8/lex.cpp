@@ -123,9 +123,20 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
                   }
             }
 
+            // 如果是空格不做处理
             if (isspace(ch))
                   continue;
 
+            /**
+             *   每个数字符号读到结束的时候，它们的结束符号必须是eoi符号。这样才可以让解析器知道当前的token是否结束。
+             * 并且满足一个表达式的结束条件。
+             *
+             * eoi = 所有的有作用的符号都是一个eoi字符。包括但不限于，{, }, (, ), +, -, *, /, ...
+             *
+             *   假设当数字结束了，它的结束符是')', 我们可以认为这个调用函数的参数。它可能是 x(100)。
+             * 其他的符号也是类似的。都可以被编译器推理出来。所以这是数字结束的必要条件，必须是符号！
+             *
+             */
             if (!eoimap->count(ch))
                   goto FLAG_THROW_INVALID_NUMBER;
 
