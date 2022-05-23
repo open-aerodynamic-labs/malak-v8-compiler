@@ -27,8 +27,8 @@ typedef void (*f_lexc)(tokenkind_t *);
  *   词法解析器map，用于方便匹配关键字等字符。
  * 相当于就是高级语言中对string做switch。
  */
-typedef std::map<std::string, f_lexc>     lexmap;
-typedef std::map<char, f_lexc>            eoimap;
+typedef std::map<std::string, f_lexc>     lexmap_t;
+typedef std::map<char, f_lexc>            eoimap_t;
 
 #define epc_add_lexc(map, key, kind) (map)->insert(std::make_pair(key, [](tokenkind_t *tk) { *tk = kind; }))
 
@@ -40,7 +40,7 @@ typedef std::map<char, f_lexc>            eoimap;
 #define PHASE_DECIMAL 2
 
 /** 初始化词法MAP */
-void init_lexc_map(lexmap *map)
+void init_lexc_map(lexmap_t *map)
 {
       epc_add_lexc(map, "var", KIND_VAR);
       epc_add_lexc(map, "char", KIND_CHAR);
@@ -51,7 +51,7 @@ void init_lexc_map(lexmap *map)
 }
 
 /** 初始化符号MAP */
-void init_eoic_map(eoimap *map)
+void init_eoic_map(eoimap_t *map)
 {
       epc_add_lexc(map, ' ', KIND_NOP);
       epc_add_lexc(map, '=', KIND_EQ);
@@ -65,7 +65,86 @@ void init_eoic_map(eoimap *map)
 }
 
 /**
+ * 处理读取到数字的情况
+ *
+ * @param ch        第一个数字
+ * @param reader    读取器
+ * @param eoimap    符号MAP
+ * @param line      行号
+ * @param col       列号
+ * @return          读取到的数字
+ */
+std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoimap, int *line, int *col)
+{
+      std::stringstream       buf;
+      std::string             buftok;
+
+      buf << ch;
+      int phase = PHASE_INTEGER;
+
+      while(!reader.look_ahead(&ch, line, col)) {
+            if (isnumber(ch)) {
+                  buf << ch;
+                  continue;
+            }
+
+            // 如果扫描到小数点，那么就代表是浮点数
+            if (ch == '.') {
+                  // 重复扫描到小数点就是错误的token，抛出异常
+                  if (phase == PHASE_DECIMAL)
+                        goto FLAG_THROW_INVALID_NUMBER;
+
+                  buf << ch;
+                  phase = PHASE_DECIMAL;
+                  continue;
+            }
+
+            // 如果是其他字符那么就开始对当前的token缓冲区进行处理
+            buf >> buftok;
+
+            if (phase != PHASE_DONE) {
+                  int tmp = phase;
+                  phase = PHASE_DONE;
+                  if (tmp == PHASE_INTEGER) {
+                        // long | int
+                        if (ch == 'L' || ch == 'l') {
+                              buftok.insert(0, "L");
+                              continue;
+                        } else {
+                              buftok.insert(0, "I");
+                        }
+                  } else {
+                        // float | double
+                        if (ch == 'F' || ch == 'f') {
+                              buftok.insert(0, "F");
+                              continue;
+                        }
+                  }
+
+                  goto FLAG_READ_NUMBER_CHECK_EOI_BREAK;
+            }
+
+            FLAG_READ_NUMBER_CHECK_EOI_BREAK:
+            if (isspace(ch))
+                  continue;
+
+            if (!eoimap->count(ch))
+                  goto FLAG_THROW_INVALID_NUMBER;
+
+            reader.back(line, col);
+            return buftok;
+      }
+
+FLAG_THROW_INVALID_NUMBER:
+      epc_throw_error("lexc error: invalid number;", *line, *col);
+      return "do nothing for return";
+}
+
+/**
  * 开始对源码做词法分析
+ *
+ * @param src     源码
+ * @return        词法分析结果
  */
 std::vector<struct token> lexps(std::string &src)
 {
@@ -76,14 +155,14 @@ std::vector<struct token> lexps(std::string &src)
       int                           line;
       int                           col;
       std::vector<struct token>     tokens;
-      lexmap                        lexc;
-      eoimap                        eoic;
+      lexmap_t                      lexmap;
+      eoimap_t                      eoimap;
       tokenkind_t                   tokenkind;
       std::string                   buftok;
 
       /* 初始化词法MAP */
-      init_lexc_map(&lexc);
-      init_eoic_map(&eoic);
+      init_lexc_map(&lexmap);
+      init_eoic_map(&eoimap);
 
       /* 添加token方法 */
 #define epc_push_token(strtok, kind)                              \
@@ -96,15 +175,15 @@ std::vector<struct token> lexps(std::string &src)
       /* 循环读入字符 */
       while (!reader.look_ahead(&ch, &line, &col)) {
             // 判断是否是eoi符号
-            bool __exist_eoi = eoic.count(ch) > 0;
+            bool __exist_eoi = eoimap.count(ch) > 0;
 
             if (isspace(ch) || __exist_eoi) {
                   buftok = buf.str();
 
                   // 如果是空格或者结束符，则认为是结束。添加当前缓存内容到token列表
                   if (buftok.length() > 0) {
-                        if (lexc.count(buftok)) {
-                              lexc[buftok](&tokenkind);
+                        if (lexmap.count(buftok)) {
+                              lexmap[buftok](&tokenkind);
                         } else {
                               tokenkind = KIND_IDENTIFIER;
                         }
@@ -115,7 +194,7 @@ std::vector<struct token> lexps(std::string &src)
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
                   if (__exist_eoi) {
                         buftok.push_back(ch);
-                        eoic[ch](&tokenkind);
+                        eoimap[ch](&tokenkind);
 
                         if (tokenkind != KIND_NOP) {
                               epc_push_token(buftok, tokenkind);
@@ -127,66 +206,9 @@ std::vector<struct token> lexps(std::string &src)
 
             /* 读到数字, 就一直循环往下读。知道读取到的内容不是数字为止 */
             if (isnumber(ch) && buf.str().length() == 0) {
-                  buf << ch;
-                  int phase = PHASE_INTEGER;
-                  while(!reader.look_ahead(&ch, &line, &col)) {
-                        if (isnumber(ch)) {
-                              buf << ch;
-                              continue;
-                        }
-
-                        // 如果扫描到小数点，那么就代表是浮点数
-                        if (ch == '.') {
-                              // 重复扫描到小数点就是错误的token，抛出异常
-                              if (phase == PHASE_DECIMAL)
-                                    goto FLAG_THROW_INVALID_NUMBER;
-
-                              buf << ch;
-                              phase = PHASE_DECIMAL;
-                              continue;
-                        }
-
-                        // 如果是其他字符那么就开始对当前的token缓冲区进行处理
-                        buf >> buftok;
-
-                        if (phase != PHASE_DONE) {
-                              int tmp = phase;
-                              phase = PHASE_DONE;
-                              if (tmp == PHASE_INTEGER) {
-                                    // long | int
-                                    if (ch == 'L' || ch == 'l') {
-                                          buftok.insert(0, "L");
-                                          continue;
-                                    } else {
-                                          buftok.insert(0, "I");
-                                    }
-                              } else {
-                                    // float | double
-                                    if (ch == 'F' || ch == 'f') {
-                                          buftok.insert(0, "F");
-                                          continue;
-                                    }
-                              }
-
-                              goto FLAG_READ_NUMBER_CHECK_EOI_BREAK;
-                        }
-
-FLAG_READ_NUMBER_CHECK_EOI_BREAK:
-                        if (isspace(ch))
-                              continue;
-
-                        if (!eoic.count(ch))
-                              goto FLAG_THROW_INVALID_NUMBER;
-
-                        reader.back(&line, &col);
-                        epc_push_token(buftok, KIND_NUMBER);
-                        break;
-                  }
-
+                  buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
+                  epc_push_token(buftok, KIND_NUMBER);
                   continue;
-
-FLAG_THROW_INVALID_NUMBER:
-                  epc_throw_error("lexc error: invalid number;", line, col);
             }
 
             buf << ch;
