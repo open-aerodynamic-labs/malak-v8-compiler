@@ -41,8 +41,8 @@ bool SourceReader::look_ahead(char *p_ch, int *p_line, int *p_col)
             *p_ch = ch;
       }
 
-      *p_line = self_line;
-      *p_col = self_col;
+      *p_line     = self_line;
+      *p_col      = self_col;
       return iseof;
 }
 

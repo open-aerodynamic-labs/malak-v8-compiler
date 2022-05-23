@@ -17,8 +17,9 @@
 
 int main()
 {
-      std::string source = "var x: float = 100.00f;";
+      std::string source = "var x: float = 100.00f;\n"
+                           "var y: float = x + 1.00f + 0.6f;";
 
-      lexps(source);
+      epc_run_lexc(source);
       return 0;
 }

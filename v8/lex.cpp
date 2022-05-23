@@ -83,26 +83,27 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
       int phase = PHASE_INTEGER;
 
       while(!reader.look_ahead(&ch, line, col)) {
-            if (isnumber(ch)) {
-                  buf << ch;
-                  continue;
-            }
-
-            // 如果扫描到小数点，那么就代表是浮点数
-            if (ch == '.') {
-                  // 重复扫描到小数点就是错误的token，抛出异常
-                  if (phase == PHASE_DECIMAL)
-                        goto FLAG_THROW_INVALID_NUMBER;
-
-                  buf << ch;
-                  phase = PHASE_DECIMAL;
-                  continue;
-            }
-
-            // 如果是其他字符那么就开始对当前的token缓冲区进行处理
-            buf >> buftok;
-
+            // 如果当前解析状态是已完成，就不再解析数字了。直接做符号判断
             if (phase != PHASE_DONE) {
+                  if (isnumber(ch)) {
+                        buf << ch;
+                        continue;
+                  }
+
+                  // 如果扫描到小数点，那么就代表是浮点数
+                  if (ch == '.') {
+                        // 重复扫描到小数点就是错误的token，抛出异常
+                        if (phase == PHASE_DECIMAL)
+                              goto FLAG_THROW_INVALID_NUMBER;
+
+                        buf << ch;
+                        phase = PHASE_DECIMAL;
+                        continue;
+                  }
+
+                  // 如果是其他字符那么就开始对当前的token缓冲区进行处理
+                  buf >> buftok;
+
                   int tmp = phase;
                   phase = PHASE_DONE;
                   if (tmp == PHASE_INTEGER) {
@@ -120,11 +121,8 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
                               continue;
                         }
                   }
-
-                  goto FLAG_READ_NUMBER_CHECK_EOI_BREAK;
             }
 
-            FLAG_READ_NUMBER_CHECK_EOI_BREAK:
             if (isspace(ch))
                   continue;
 
@@ -146,7 +144,7 @@ FLAG_THROW_INVALID_NUMBER:
  * @param src     源码
  * @return        词法分析结果
  */
-std::vector<struct token> lexps(std::string &src)
+std::vector<struct token> epc_run_lexc(std::string &src)
 {
       char                          ch;
       std::stringstream             buf;
