@@ -39,8 +39,6 @@ typedef std::map<char, f_lexc>            eoimap;
 #define PHASE_INTEGER 1
 #define PHASE_DECIMAL 2
 
-#define error_invalid_number(line, col) throw std::runtime_error("lexical error: invalid number")
-
 /** 初始化词法MAP */
 void init_lexc_map(lexmap *map)
 {
@@ -141,7 +139,7 @@ std::vector<struct token> lexps(std::string &src)
                         if (ch == '.') {
                               // 重复扫描到小数点就是错误的token，抛出异常
                               if (phase == PHASE_DECIMAL)
-                                    error_invalid_number(line, col);
+                                    goto FLAG_THROW_INVALID_NUMBER;
 
                               buf << ch;
                               phase = PHASE_DECIMAL;
@@ -167,8 +165,6 @@ std::vector<struct token> lexps(std::string &src)
                                     if (ch == 'F' || ch == 'f') {
                                           buftok.insert(0, "F");
                                           continue;
-                                    } else {
-                                          buftok.insert(0, "D");
                                     }
                               }
 
@@ -180,13 +176,17 @@ FLAG_READ_NUMBER_CHECK_EOI_BREAK:
                               continue;
 
                         if (!eoic.count(ch))
-                              error_invalid_number(line, col);
+                              goto FLAG_THROW_INVALID_NUMBER;
 
                         reader.back(&line, &col);
                         epc_push_token(buftok, KIND_NUMBER);
                         break;
                   }
+
                   continue;
+
+FLAG_THROW_INVALID_NUMBER:
+                  epc_throw_error("lexc error: invalid number;", line, col);
             }
 
             buf << ch;

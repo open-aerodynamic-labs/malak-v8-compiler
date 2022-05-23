@@ -18,6 +18,7 @@
 
 #include "tokenkind.h"
 #include <string>
+#include <stdexcept>
 
 /**
  * token
@@ -38,6 +39,17 @@ inline static void epc_make_token(struct token *p_token, std::string &v, tokenki
       p_token->value = v;
       p_token->line = line;
       p_token->col = col;
+}
+
+/**
+ * 抛出异常
+ */
+inline static void epc_throw_error(std::string fmt, int line, int col)
+{
+      fmt = fmt + " (line=%d, col=%d)\n";
+      char buf[512];
+      snprintf(buf, sizeof(buf), fmt.c_str(), line, col);
+      throw std::runtime_error(buf);
 }
 
 /** 打印token */
