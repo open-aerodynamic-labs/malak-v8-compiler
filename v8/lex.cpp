@@ -35,6 +35,7 @@ typedef std::map<char, f_lexc>            eoimap;
 /**
  * 解析阶段
  */
+#define PHASE_DONE    0
 #define PHASE_INTEGER 1
 #define PHASE_DECIMAL 2
 
@@ -136,7 +137,9 @@ std::vector<struct token> lexps(std::string &src)
                               continue;
                         }
 
+                        // 如果扫描到小数点，那么就代表是浮点数
                         if (ch == '.') {
+                              // 重复扫描到小数点就是错误的token，抛出异常
                               if (phase == PHASE_DECIMAL)
                                     error_invalid_number(line, col);
 
@@ -145,32 +148,40 @@ std::vector<struct token> lexps(std::string &src)
                               continue;
                         }
 
+                        // 如果是其他字符那么就开始对当前的token缓冲区进行处理
                         buf >> buftok;
 
-                        if (phase == PHASE_INTEGER) {
-                              // long
-                              if (ch == 'L' || ch == 'l') {
-                                    buftok.insert(0, "L");
-                                    goto FLAG_READ_NUMBER_BREAK;
+                        if (phase != PHASE_DONE) {
+                              int tmp = phase;
+                              phase = PHASE_DONE;
+                              if (tmp == PHASE_INTEGER) {
+                                    // long | int
+                                    if (ch == 'L' || ch == 'l') {
+                                          buftok.insert(0, "L");
+                                          continue;
+                                    } else {
+                                          buftok.insert(0, "I");
+                                    }
+                              } else {
+                                    // float | double
+                                    if (ch == 'F' || ch == 'f') {
+                                          buftok.insert(0, "F");
+                                          continue;
+                                    } else {
+                                          buftok.insert(0, "D");
+                                    }
                               }
 
-                              buftok.insert(0, "I");
-                              goto FLAG_READ_NUMBER_CHECK_EOI_BREAK;
-                        } else {
-                              // float
-                              if (ch == 'F' || ch == 'f') {
-                                    buftok.insert(0, "F");
-                                    goto FLAG_READ_NUMBER_BREAK;
-                              }
-
-                              buftok.insert(0, "F");
                               goto FLAG_READ_NUMBER_CHECK_EOI_BREAK;
                         }
 
 FLAG_READ_NUMBER_CHECK_EOI_BREAK:
+                        if (isspace(ch))
+                              continue;
+
                         if (!eoic.count(ch))
                               error_invalid_number(line, col);
-FLAG_READ_NUMBER_BREAK:
+
                         reader.back(&line, &col);
                         epc_push_token(buftok, KIND_NUMBER);
                         break;
