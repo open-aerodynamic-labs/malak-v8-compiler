@@ -37,11 +37,11 @@ typedef std::map<char, f_lexc>            eoimap_t;
 /**
  * 解析阶段
  */
-#define PHASE_NOP        -1
-#define PHASE_DONE        0
-#define PHASE_INTEGER     1
-#define PHASE_DECIMAL     2
-#define PHASE_BACKSLASH   3
+#define PHASE_NOP        (-1)
+#define PHASE_DONE         0
+#define PHASE_INTEGER      1
+#define PHASE_DECIMAL      2
+#define PHASE_BACKSLASH    3
 
 /** 初始化词法MAP */
 void init_lexc_map(lexmap_t *map)
