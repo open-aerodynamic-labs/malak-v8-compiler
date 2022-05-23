@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 #include "v8/lex.h"
+#include <iostream>
+#include <fstream>
 
 int main()
 {
-      std::string source = "var x: float = 100.00f;\n"
-                           "var y: float = x + 1.00f + 0.6f;";
+      std::ifstream ifs("./main.epc");
+      std::string source((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+      ifs.close();
 
       epc_run_lexc(source);
+
       return 0;
 }
