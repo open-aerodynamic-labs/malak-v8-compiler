@@ -16,31 +16,36 @@
 #ifndef __EPOCH_TOKENKIND_H__
 #define __EPOCH_TOKENKIND_H__
 
-#define KIND_VAR                      1
-#define KIND_CHAR                     2
-#define KIND_INT                      3
-#define KIND_LONG                     4
-#define KIND_FLOAT                    5
-#define KIND_DOUBLE                   6
-#define KIND_IDENTIFIER               7
-#define KIND_STRING                   8
-#define KIND_NUMBER                   9
-#define KIND_EQ                      10
-#define KIND_ADD                     11
-#define KIND_SUB                     12
-#define KIND_STAR                    13
-#define KIND_SLASH                   14
-#define KIND_NOP                     15
-#define KIND_EOI                     16
-#define KIND_EOF                     17
-#define KIND_SPACE                   18
-#define KIND_STRING_LITERAL          19
-#define KIND_CHARACTER_LITERAL       20
-#define KIND_OPEN_PAREN              21
-#define KIND_CLOSE_PAREN             22
-#define KIND_OPEN_BRACE              23
-#define KIND_CLOSE_BRACE             24
-#define KIND_FUNC                    25
+/* 关键字 */
+#define KIND_VAR                      1001
+#define KIND_FUNC                     1002
+#define KIND_CHAR                     1003
+#define KIND_INT                      1004
+#define KIND_LONG                     1005
+#define KIND_FLOAT                    1006
+#define KIND_DOUBLE                   1007
+
+/* 字面量 */
+#define KIND_IDENTIFIER               2001
+#define KIND_STRING                   2002
+#define KIND_NUMBER                   2003
+#define KIND_STRING_LITERAL           2004
+#define KIND_CHARACTER_LITERAL        2005
+
+/* 符号 */
+#define KIND_EQ                       3001
+#define KIND_ADD                      3002
+#define KIND_SUB                      3003
+#define KIND_STAR                     3004
+#define KIND_SLASH                    3005
+#define KIND_OPEN_PAREN               3006
+#define KIND_CLOSE_PAREN              3007
+#define KIND_OPEN_BRACE               3008
+#define KIND_CLOSE_BRACE              3009
+
+#define KIND_NOP                         0
+#define KIND_EOI                         1
+#define KIND_EOF                         2
 
 typedef unsigned tokenkind_t;
 
