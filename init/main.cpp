@@ -19,7 +19,7 @@
 
 int main()
 {
-      std::ifstream ifs("../main.epc");
+      std::ifstream ifs("../main.xep");
       std::string source((std::istreambuf_iterator<char>(ifs)),
                           (std::istreambuf_iterator<char>()));
       ifs.close();

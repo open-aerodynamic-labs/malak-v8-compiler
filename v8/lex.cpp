@@ -53,7 +53,11 @@ void init_lexc_map(lexmap_t *map)
       epc_add_lexc(map, "float", KIND_FLOAT);
       epc_add_lexc(map, "double", KIND_DOUBLE);
       epc_add_lexc(map, "string", KIND_STRING);
-      epc_add_lexc(map, "func", KIND_FUNC);
+      epc_add_lexc(map, "fun", KIND_FUN);
+      epc_add_lexc(map, "varargs", KIND_VARARGS);
+      epc_add_lexc(map, "any", KIND_ANY);
+      epc_add_lexc(map, "return", KIND_RETURN);
+      epc_add_lexc(map, "goto", KIND_GOTO);
 }
 
 /** 初始化符号MAP */
@@ -67,6 +71,7 @@ void init_eoic_map(eoimap_t *map)
       epc_add_lexc(map, '/', KIND_SLASH);
       epc_add_lexc(map, ';', KIND_EOI);
       epc_add_lexc(map, ':', KIND_NOP);
+      epc_add_lexc(map, ',', KIND_DOT);
       epc_add_lexc(map, '(', KIND_OPEN_PAREN);
       epc_add_lexc(map, ')', KIND_CLOSE_PAREN);
       epc_add_lexc(map, '{', KIND_OPEN_BRACE);
@@ -310,9 +315,9 @@ std::vector<struct token> epc_run_lexc(std::string &src)
       /* 循环读入字符 */
       while (!reader.look_ahead(&ch, &line, &col)) {
             // 判断是否是eoi符号
-            bool __exist_eoi = eoimap.count(ch) > 0;
+            bool curch_is_eoi = eoimap.count(ch) > 0;
 
-            if (isspace(ch) || __exist_eoi) {
+            if (isspace(ch) || curch_is_eoi) {
                   buftok = buf.str();
 
                   // 如果是空格或者结束符，则认为是结束。添加当前缓存内容到token列表
@@ -327,7 +332,7 @@ std::vector<struct token> epc_run_lexc(std::string &src)
                   }
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
-                  if (__exist_eoi) {
+                  if (curch_is_eoi) {
                         buftok.push_back(ch);
                         eoimap[ch](&tokenkind);
 
