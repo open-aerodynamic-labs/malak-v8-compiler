@@ -53,6 +53,7 @@ void init_lexc_map(lexmap_t *map)
       epc_add_lexc(map, "float", KIND_FLOAT);
       epc_add_lexc(map, "double", KIND_DOUBLE);
       epc_add_lexc(map, "string", KIND_STRING);
+      epc_add_lexc(map, "func", KIND_FUNC);
 }
 
 /** 初始化符号MAP */
@@ -66,6 +67,10 @@ void init_eoic_map(eoimap_t *map)
       epc_add_lexc(map, '/', KIND_SLASH);
       epc_add_lexc(map, ';', KIND_EOI);
       epc_add_lexc(map, ':', KIND_NOP);
+      epc_add_lexc(map, '(', KIND_OPEN_PAREN);
+      epc_add_lexc(map, ')', KIND_CLOSE_PAREN);
+      epc_add_lexc(map, '{', KIND_OPEN_BRACE);
+      epc_add_lexc(map, '}', KIND_CLOSE_BRACE);
       epc_add_lexc(map, '\0', KIND_EOF);
 }
 

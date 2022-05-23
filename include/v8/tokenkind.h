@@ -36,6 +36,11 @@
 #define KIND_SPACE                   18
 #define KIND_STRING_LITERAL          19
 #define KIND_CHARACTER_LITERAL       20
+#define KIND_OPEN_PAREN              21
+#define KIND_CLOSE_PAREN             22
+#define KIND_OPEN_BRACE              23
+#define KIND_CLOSE_BRACE             24
+#define KIND_FUNC                    25
 
 typedef unsigned tokenkind_t;
 

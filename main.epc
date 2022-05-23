@@ -1,1 +1,3 @@
-var ch: char = '\a';
+func main() {
+    var fmt: string = "hello epoch!";
+}
