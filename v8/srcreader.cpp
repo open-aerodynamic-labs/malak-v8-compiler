@@ -69,9 +69,12 @@ const bool xep_source_reader::eof()
       return self_pos >= self_src_size;
 }
 
-void xep_source_reader::skip_next()
+char xep_source_reader::skip_next()
 {
-      self_pos++;
+
+      char ch;
+      look_ahead(&ch, &self_line, &self_col);
+      return ch;
 }
 
 char xep_source_reader::peek_next()

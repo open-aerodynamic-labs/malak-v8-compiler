@@ -31,7 +31,7 @@ public:
       /* 查看下一个字符 */
       char peek_next();
       /* 跳到下一个字符 */
-      void skip_next();
+      char skip_next();
       /** 是否读到文件末尾 */
       const bool eof();
 

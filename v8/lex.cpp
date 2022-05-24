@@ -80,6 +80,7 @@ void init_lexc_map(lexmap_t *map)
 void init_eoic_map(eoimap_t *map)
 {
       xep_add_lexc(map, ' ', KIND_NOP);
+      xep_add_lexc(map, '!', KIND_NOP);
       xep_add_lexc(map, '=', KIND_EQ);
       xep_add_lexc(map, '+', KIND_ADD);
       xep_add_lexc(map, '-', KIND_SUB);
@@ -356,109 +357,135 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
                   if (eoi_ch) {
-                        if (ch == '+') {
-                              switch (reader.peek_next()) {
-                                    case '+': {
-                                          reader.skip_next();
-                                          buftok = "++";
-                                          xep_push_token(buftok, KIND_ADDADD);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = "+=";
-                                          xep_push_token(buftok, KIND_ADDEQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
-                              }
-                        }
-
-                        if (ch == '-') {
-                              switch (reader.peek_next()) {
-                                    case '-': {
-                                          reader.skip_next();
-                                          buftok = "--";
-                                          xep_push_token(buftok, KIND_SUBSUB);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
-                                    case '>': {
-                                          reader.skip_next();
-                                          buftok = "->";
-                                          xep_push_token(buftok, KIND_ARROW);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = "-=";
-                                          xep_push_token(buftok, KIND_SUBEQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                        switch (ch) {
+                              case '+': {
+                                    switch (reader.peek_next()) {
+                                          case '+': {
+                                                reader.skip_next();
+                                                buftok = "++";
+                                                xep_push_token(buftok, KIND_ADDADD);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "+=";
+                                                xep_push_token(buftok, KIND_ADDEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
                                     }
                               }
-                        }
 
-                        if (ch == '*') {
-                              switch (reader.peek_next()) {
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = "*=";
-                                          xep_push_token(buftok, KIND_STAREQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                              case '-': {
+                                    switch (reader.peek_next()) {
+                                          case '-': {
+                                                reader.skip_next();
+                                                buftok = "--";
+                                                xep_push_token(buftok, KIND_SUBSUB);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                          case '>': {
+                                                reader.skip_next();
+                                                buftok = "->";
+                                                xep_push_token(buftok, KIND_ARROW);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "-=";
+                                                xep_push_token(buftok, KIND_SUBEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
                                     }
                               }
-                        }
 
-                        if (ch == '/') {
-                              switch (reader.peek_next()) {
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = "/=";
-                                          xep_push_token(buftok, KIND_SLASHEQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                              case '*': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "*=";
+                                                xep_push_token(buftok, KIND_STAREQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
                                     }
                               }
-                        }
 
-                        if (ch == '<') {
-                              switch (reader.peek_next()) {
-                                    case '<': {
-                                          reader.skip_next();
-                                          buftok = "<<";
-                                          xep_push_token(buftok, KIND_LSHIFT);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
-
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = "<=";
-                                          xep_push_token(buftok, KIND_LTEQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                              case '/': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "/=";
+                                                xep_push_token(buftok, KIND_SLASHEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
                                     }
                               }
-                        }
 
-                        if (ch == '>') {
-                              switch (reader.peek_next()) {
-                                    case '>': {
-                                          reader.skip_next();
-                                          buftok = ">";
-                                          xep_push_token(buftok, KIND_RSHIFT);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
-                                    }
+                              case '<': {
+                                    switch (reader.peek_next()) {
+                                          case '<': {
+                                                reader.skip_next();
+                                                buftok = "<<";
+                                                xep_push_token(buftok, KIND_LSHIFT);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
 
-                                    case '=': {
-                                          reader.skip_next();
-                                          buftok = ">=";
-                                          xep_push_token(buftok, KIND_GTEQ);
-                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "<=";
+                                                xep_push_token(buftok, KIND_LTEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
                                     }
                               }
-                        }
 
-                        buftok.push_back(ch);
-                        eoimap[ch](&tokenkind);
+                              case '>': {
+                                    switch (reader.peek_next()) {
+                                          case '>': {
+                                                reader.skip_next();
+                                                buftok = ">";
+                                                xep_push_token(buftok, KIND_RSHIFT);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
 
-                        if (tokenkind != KIND_NOP) {
-                              xep_push_token(buftok, tokenkind);
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = ">=";
+                                                xep_push_token(buftok, KIND_GTEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '!': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "!=";
+                                                xep_push_token(buftok, KIND_NE);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '=': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "==";
+                                                xep_push_token(buftok, KIND_EQEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              default: {
+                                    buftok.push_back(ch);
+                                    eoimap[ch](&tokenkind);
+
+                                    if (tokenkind != KIND_NOP) {
+                                          xep_push_token(buftok, tokenkind);
+                                    }
+                              }
                         }
                   }
 

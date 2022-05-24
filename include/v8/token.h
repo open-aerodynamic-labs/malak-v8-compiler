@@ -55,7 +55,8 @@
 #define KIND_CHARACTER_LITERAL        2005
 
 /* 符号 */
-#define KIND_EQ                       3001
+#define KIND_EQ                       3000
+#define KIND_NE                       3001
 #define KIND_ADD                      3002
 #define KIND_SUB                      3003
 #define KIND_STAR                     3004
@@ -82,6 +83,7 @@
 #define KIND_LTEQ                     3025
 #define KIND_LSHIFT                   3026
 #define KIND_RSHIFT                   3027
+#define KIND_EQEQ                     3028
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1
