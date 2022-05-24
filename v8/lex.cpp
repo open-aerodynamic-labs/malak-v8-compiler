@@ -21,7 +21,7 @@
 
 #define clearbuf(x) x.str("")
 
-#define __INVALID_RETURN_STRING__() return ""
+#define __EMPTY_STRING__() ""
 
 /** 词法解析回调函数，获取当前token kind */
 typedef void (*f_lexc)(tokenkind_t *);
@@ -118,7 +118,7 @@ void init_eoic_map(eoimap_t *map)
  * @param col       列号
  * @return          读取到的数字
  */
-std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t *eoimap, int *line, int *col)
+std::string lexc_read_number(char ch, xep_source_reader &reader, eoimap_t &eoimap, int *line, int *col)
 {
       std::stringstream       buf;
       std::string             buftok;
@@ -204,7 +204,7 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
              * 其他的符号也是类似的。都可以被编译器推理出来。所以这是数字结束的必要条件，必须是符号！
              *
              */
-            if (!eoimap->count(ch))
+            if (!eoimap.count(ch))
                   goto FLAG_THROW_INVALID_NUMBER;
 
             reader.back(line, col);
@@ -217,7 +217,7 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
 
 FLAG_THROW_INVALID_NUMBER:
       xep_throw_error("lexc error: invalid number;", *line, *col);
-      __INVALID_RETURN_STRING__();
+      return __EMPTY_STRING__();
 }
 
 /**
@@ -265,7 +265,7 @@ std::string lexc_read_string(char ch, xep_source_reader &reader, int *line, int 
       }
 
       xep_throw_error("lexc error: string not closed;", *line, *col);
-      __INVALID_RETURN_STRING__();
+      return __EMPTY_STRING__();
 }
 
 /**
@@ -333,7 +333,259 @@ FLAG_INVALID_CHARACTER:
       char xnbuf[512];
       snprintf(xnbuf, sizeof(xnbuf), "lexc error: invalid character %s;", buf.str().c_str());
       xep_throw_error(xnbuf, *line, *col);
-      __INVALID_RETURN_STRING__();
+      return __EMPTY_STRING__();
+}
+
+std::string xep_read_eoi(char ch, xep_source_reader &reader, eoimap_t &eoimap,
+                         tokenkind_t *kind, int *line, int *col)
+{
+      std::string buftok;
+
+      switch (ch) {
+            case '+': {
+                  switch (reader.peek_next()) {
+                        case '+': {
+                              reader.skip_next();
+                              buftok = "++";
+                              *kind = KIND_ADDADD;
+                              return buftok;
+                        }
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "+=";
+                              *kind = KIND_ADDEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '-': {
+                  switch (reader.peek_next()) {
+                        case '-': {
+                              reader.skip_next();
+                              buftok = "--";
+                              *kind = KIND_SUBSUB;
+                              return buftok;
+                        }
+
+                        case '>': {
+                              reader.skip_next();
+                              buftok = "->";
+                              *kind = KIND_ARROW;
+                              return buftok;
+                        }
+
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "-=";
+                              *kind = KIND_SUBEQ;
+                              return buftok;
+                        }
+
+                              /* 如果是数字，那么有可能是负数。交给数字解析函数去解析 */
+                        default: {
+                              if (isnumber(reader.peek_next())) {
+                                    buftok = lexc_read_number(ch, reader, eoimap, line, col);
+                                    *kind = KIND_NUMBER;
+                                    return buftok;
+                              }
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '*': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "*=";
+                              *kind = KIND_STAREQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '/': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "/=";
+                              *kind = KIND_SLASHEQ;
+                              return buftok;
+                        }
+
+                              /* 读取到了单行注释，直接跳过这一行 */
+                        case '/': {
+                              reader.skip_line();
+                              *kind = KIND_NOP;
+                              return __EMPTY_STRING__();
+                        }
+
+                              /* 读到了多行注释，直接读到结束位置 */
+                        case '*': {
+                              while (!reader.look_ahead(&ch, line, col)) {
+                                    if (ch == '*' && reader.peek_next() == '/') {
+                                          reader.skip_next();
+                                          *kind = KIND_NOP;
+                                          return __EMPTY_STRING__();
+                                    }
+                              }
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '<': {
+                  switch (reader.peek_next()) {
+                        case '<': {
+                              reader.skip_next();
+                              buftok = "<<";
+                              *kind = KIND_LSHIFT;
+                              return buftok;
+                        }
+
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "<=";
+                              *kind = KIND_LTEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '>': {
+                  switch (reader.peek_next()) {
+                        case '>': {
+                              reader.skip_next();
+                              buftok = ">";
+                              *kind = KIND_RSHIFT;
+                              return buftok;
+                        }
+
+                        case '=': {
+                              reader.skip_next();
+                              buftok = ">=";
+                              *kind = KIND_GTEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '!': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "!=";
+                              *kind = KIND_NE;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '=': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "==";
+                              *kind = KIND_EQEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '|': {
+                  switch (reader.peek_next()) {
+                        case '|': {
+                              reader.skip_next();
+                              buftok = "||";
+                              *kind = KIND_OROR;
+                              return buftok;
+                        }
+
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "|=";
+                              *kind = KIND_OREQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '&': {
+                  switch (reader.peek_next()) {
+                        case '&': {
+                              reader.skip_next();
+                              buftok = "&&";
+                              *kind = KIND_ANDAND;
+                              return buftok;
+                        }
+
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "&=";
+                              *kind = KIND_ANDEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '~': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "~=";
+                              *kind = KIND_NOTEQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+            case '^': {
+                  switch (reader.peek_next()) {
+                        case '=': {
+                              reader.skip_next();
+                              buftok = "^=";
+                              *kind = KIND_XOREQ;
+                              return buftok;
+                        }
+                  }
+
+                  goto JUMP_TO_DEFAULT;
+            }
+
+JUMP_TO_DEFAULT:
+            default: {
+                  buftok.push_back(ch);
+                  eoimap[ch](kind);
+
+                  if (*kind != KIND_NOP) {
+                        return buftok;
+                  }
+            }
+      }
+
+      *kind = KIND_NOP;
+      return __EMPTY_STRING__();
 }
 
 /**
@@ -389,220 +641,9 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
                   if (eoi_ch) {
-                        switch (ch) {
-                              case '+': {
-                                    switch (reader.peek_next()) {
-                                          case '+': {
-                                                reader.skip_next();
-                                                buftok = "++";
-                                                xep_push_token(buftok, KIND_ADDADD);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "+=";
-                                                xep_push_token(buftok, KIND_ADDEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '-': {
-                                    switch (reader.peek_next()) {
-                                          case '-': {
-                                                reader.skip_next();
-                                                buftok = "--";
-                                                xep_push_token(buftok, KIND_SUBSUB);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '>': {
-                                                reader.skip_next();
-                                                buftok = "->";
-                                                xep_push_token(buftok, KIND_ARROW);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "-=";
-                                                xep_push_token(buftok, KIND_SUBEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          /* 如果是数字，那么有可能是负数。交给数字解析函数去解析 */
-                                          default: {
-                                                if (isnumber(reader.peek_next())) {
-                                                      buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
-                                                      xep_push_token(buftok, KIND_NUMBER);
-                                                      goto FLAG_LOOK_AHEAD_CONTINUE;
-                                                }
-                                          }
-                                    }
-                              }
-
-                              case '*': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "*=";
-                                                xep_push_token(buftok, KIND_STAREQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '/': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "/=";
-                                                xep_push_token(buftok, KIND_SLASHEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          /* 读取到了单行注释，直接跳过这一行 */
-                                          case '/': {
-                                                reader.skip_line();
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          /* 读到了多行注释，直接读到结束位置 */
-                                          case '*': {
-                                                while (!reader.look_ahead(&ch, &line, &col)) {
-                                                      if (ch == '*' && reader.peek_next() == '/') {
-                                                            reader.skip_next();
-                                                            goto FLAG_LOOK_AHEAD_CONTINUE;
-                                                      }
-                                                }
-                                          }
-                                    }
-                              }
-
-                              case '<': {
-                                    switch (reader.peek_next()) {
-                                          case '<': {
-                                                reader.skip_next();
-                                                buftok = "<<";
-                                                xep_push_token(buftok, KIND_LSHIFT);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "<=";
-                                                xep_push_token(buftok, KIND_LTEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '>': {
-                                    switch (reader.peek_next()) {
-                                          case '>': {
-                                                reader.skip_next();
-                                                buftok = ">";
-                                                xep_push_token(buftok, KIND_RSHIFT);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = ">=";
-                                                xep_push_token(buftok, KIND_GTEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '!': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "!=";
-                                                xep_push_token(buftok, KIND_NE);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '=': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "==";
-                                                xep_push_token(buftok, KIND_EQEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '|': {
-                                    switch (reader.peek_next()) {
-                                          case '|': {
-                                                reader.skip_next();
-                                                buftok = "||";
-                                                xep_push_token(buftok, KIND_OROR);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "|=";
-                                                xep_push_token(buftok, KIND_OREQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '&': {
-                                    switch (reader.peek_next()) {
-                                          case '&': {
-                                                reader.skip_next();
-                                                buftok = "&&";
-                                                xep_push_token(buftok, KIND_ANDAND);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "&=";
-                                                xep_push_token(buftok, KIND_ANDEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '~': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "~=";
-                                                xep_push_token(buftok, KIND_NOTEQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              case '^': {
-                                    switch (reader.peek_next()) {
-                                          case '=': {
-                                                reader.skip_next();
-                                                buftok = "^=";
-                                                xep_push_token(buftok, KIND_XOREQ);
-                                                goto FLAG_LOOK_AHEAD_CONTINUE;
-                                          }
-                                    }
-                              }
-
-                              default: {
-                                    buftok.push_back(ch);
-                                    eoimap[ch](&tokenkind);
-
-                                    if (tokenkind != KIND_NOP) {
-                                          xep_push_token(buftok, tokenkind);
-                                    }
-                              }
+                        buftok = xep_read_eoi(ch, reader, eoimap, &tokenkind, &line, &col);
+                        if (tokenkind != KIND_NOP) {
+                              xep_push_token(buftok, tokenkind);
                         }
                   }
 
@@ -625,7 +666,7 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
             /* 读到数字, 就一直循环往下读。知道读取到的内容不是数字为止 */
             if (isnumber(ch) && buf.str().length() == 0) {
-                  buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
+                  buftok = lexc_read_number(ch, reader, eoimap, &line, &col);
                   xep_push_token(buftok, KIND_NUMBER);
                   goto FLAG_LOOK_AHEAD_CONTINUE;
             }
