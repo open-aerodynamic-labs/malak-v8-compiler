@@ -1,3 +1,1 @@
-var x: float = 20.0f;
-
-~x;
+var x: int = 1 + (2 * 3) - -x;

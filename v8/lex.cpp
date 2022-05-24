@@ -395,13 +395,29 @@ std::string xep_read_eoi(char ch, xep_source_reader &reader, eoimap_t &eoimap,
                               return buftok;
                         }
 
-                              /* 如果是数字，那么有可能是负数。交给数字解析函数去解析 */
                         default: {
+                              /* 如果是数字，那么有可能是负数。交给数字解析函数去解析 */
                               if (isnumber(reader.peek_next())) {
                                     buftok = lexc_read_number(ch, reader, eoimap, line, col);
                                     *kind = KIND_NUMBER;
                                     return buftok;
                               }
+
+                              /* 如果紧跟着字符，那么也有可能是负数变量。 比如：-x */
+                              if (let(reader.peek_next())) {
+                                    buftok.push_back(ch);
+                                    while(!reader.look_ahead(&ch, line, col)) {
+                                          // 读到了一个符号
+                                          if (eoimap.count(ch)) {
+                                                reader.back(line, col);
+                                                *kind = KIND_NUMBER;
+                                                return buftok;
+                                          }
+
+                                          buftok.push_back(ch);
+                                    }
+                              }
+
                         }
                   }
 
