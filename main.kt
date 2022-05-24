@@ -1,3 +1,1 @@
-fun main(varargs args: string) {
-    var x: int |= 2 ^ 1;
-}
+0xABCD1230fFF1abcdef;

@@ -28,6 +28,8 @@ public:
       bool look_ahead(char *p_ch, int *p_line, int *p_col);
       /** 回退到上一个字符 */
       void back(int *p_line, int *p_col);
+      /* 查看上一个字符 */
+      char peek_back();
       /* 查看下一个字符 */
       char peek_next();
       /* 跳到下一个字符 */

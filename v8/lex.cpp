@@ -17,6 +17,7 @@
 #include "srcreader.h"
 #include <sstream>
 #include <map>
+#include <algorithm>
 
 #define clearbuf(x) x.str("")
 
@@ -41,7 +42,8 @@ typedef std::map<char, f_lexc>            eoimap_t;
 #define PHASE_DONE         0
 #define PHASE_INTEGER      1
 #define PHASE_DECIMAL      2
-#define PHASE_BACKSLASH    3
+#define PHASE_HEX          5
+#define PHASE_BACKSLASH    4
 
 /** 初始化词法MAP */
 void init_lexc_map(lexmap_t *map)
@@ -131,14 +133,27 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
                         continue;
                   }
 
+                  /* 如果是扫描到了16进制，那么则允许 a - f | A - F的字符 */
+                  if (phase == PHASE_HEX && (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
+                        buf << ch;
+                        continue;
+                  }
+
                   // 如果扫描到小数点，那么就代表是浮点数
                   if (ch == '.') {
                         // 重复扫描到小数点就是错误的token，抛出异常
-                        if (phase == PHASE_DECIMAL)
+                        if (phase == PHASE_DECIMAL || phase == PHASE_HEX)
                               goto FLAG_THROW_INVALID_NUMBER;
 
                         buf << ch;
                         phase = PHASE_DECIMAL;
+                        continue;
+                  }
+
+                  // 读到了16进制数字
+                  if ((ch == 'x' || ch == 'X') && reader.peek_back() == '0') {
+                        buf << ch;
+                        phase = PHASE_HEX;
                         continue;
                   }
 
@@ -155,7 +170,7 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
                         } else {
                               buftok.insert(0, "I");
                         }
-                  } else {
+                  } else if (tmp == PHASE_DECIMAL) {
                         // float | double
                         if (ch == 'F' || ch == 'f') {
                               buftok.insert(0, "F");
@@ -163,6 +178,10 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
                         } else {
                               buftok.insert(0, "D");
                         }
+                  } else {
+                        // hex
+                        std::transform(buftok.begin(), buftok.end(), buftok.begin(), ::toupper);
+                        buftok.insert(0, "H");
                   }
             }
 

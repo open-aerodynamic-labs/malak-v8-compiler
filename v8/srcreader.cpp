@@ -77,6 +77,11 @@ char xep_source_reader::skip_next()
       return ch;
 }
 
+char xep_source_reader::peek_back()
+{
+      return self_source[self_pos - 2];
+}
+
 char xep_source_reader::peek_next()
 {
       if (self_pos < self_src_size) {
