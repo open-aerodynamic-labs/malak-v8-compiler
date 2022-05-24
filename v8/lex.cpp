@@ -336,6 +336,17 @@ FLAG_INVALID_CHARACTER:
       return __EMPTY_STRING__();
 }
 
+/**
+ * 特殊符号判断
+ *
+ * @param ch        当前读取到的字符
+ * @param reader    源码读取器
+ * @param eoimap    特殊符号映射表
+ * @param kind      特殊符号类型指针，如果值为 KIND_NOP, 那么就什么都不做。
+ * @param line      行号
+ * @param col       列号
+ * @return          token
+ */
 std::string xep_read_eoi(char ch, xep_source_reader &reader, eoimap_t &eoimap,
                          tokenkind_t *kind, int *line, int *col)
 {
