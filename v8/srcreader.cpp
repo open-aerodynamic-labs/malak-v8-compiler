@@ -71,10 +71,19 @@ const bool xep_source_reader::eof()
 
 char xep_source_reader::skip_next()
 {
-
       char ch;
       look_ahead(&ch, &self_line, &self_col);
       return ch;
+}
+
+void xep_source_reader::skip_line()
+{
+      while (!eof()) {
+            char ch = skip_next();
+            if (ch == '\n') {
+                  break;
+            }
+      }
 }
 
 char xep_source_reader::peek_back()

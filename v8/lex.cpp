@@ -75,6 +75,7 @@ void init_lexc_map(lexmap_t *map)
       xep_add_lexc(map, "switch", KIND_SWITCH);
       xep_add_lexc(map, "case", KIND_CASE);
       xep_add_lexc(map, "default", KIND_DEFAULT);
+      xep_add_lexc(map, "sizeof", KIND_SIZEOF);
 
 }
 
@@ -134,7 +135,7 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
                   }
 
                   /* 如果是扫描到了16进制，那么则允许 a - f | A - F的字符 */
-                  if (phase == PHASE_HEX && (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F')) {
+                  if (phase == PHASE_HEX && ((ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'))) {
                         buf << ch;
                         continue;
                   }
@@ -439,6 +440,22 @@ std::vector<struct token> xep_run_lexc(std::string &src)
                                                 buftok = "/=";
                                                 xep_push_token(buftok, KIND_SLASHEQ);
                                                 goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+
+                                          /* 读取到了单行注释，直接跳过这一行 */
+                                          case '/': {
+                                                reader.skip_line();
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+
+                                          /* 读到了多行注释，直接读到结束位置 */
+                                          case '*': {
+                                                while (!reader.look_ahead(&ch, &line, &col)) {
+                                                      if (ch == '*' && reader.peek_next() == '/') {
+                                                            reader.skip_next();
+                                                            goto FLAG_LOOK_AHEAD_CONTINUE;
+                                                      }
+                                                }
                                           }
                                     }
                               }

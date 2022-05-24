@@ -34,6 +34,8 @@ public:
       char peek_next();
       /* 跳到下一个字符 */
       char skip_next();
+      /* 跳过当前行 */
+      void skip_line();
       /** 是否读到文件末尾 */
       const bool eof();
 
