@@ -139,6 +139,9 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
                         if (ch == 'F' || ch == 'f') {
                               buftok.insert(0, "F");
                               continue;
+                        } else {
+                              buftok.insert(0, "D");
+                              continue;
                         }
                   }
             }
@@ -338,11 +341,23 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
                   if (curch_is_eoi) {
-                        buftok.push_back(ch);
-                        eoimap[ch](&tokenkind);
+                        if (ch == '+' && reader.peek_next() == '+') {
+                              buftok.push_back(ch);
+                              reader.look_ahead(&ch, &line, &col);
+                              buftok.push_back(ch);
+                              xep_push_token(buftok, KIND_ADDADD);
+                        } else if (ch == '+' && reader.peek_next() == '+') {
+                              buftok.push_back(ch);
+                              reader.look_ahead(&ch, &line, &col);
+                              buftok.push_back(ch);
+                              xep_push_token(buftok, KIND_SUBSUB);
+                        } else {
+                              buftok.push_back(ch);
+                              eoimap[ch](&tokenkind);
 
-                        if (tokenkind != KIND_NOP) {
-                              xep_push_token(buftok, tokenkind);
+                              if (tokenkind != KIND_NOP) {
+                                    xep_push_token(buftok, tokenkind);
+                              }
                         }
                   }
 

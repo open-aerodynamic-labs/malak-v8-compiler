@@ -9,7 +9,7 @@ object source_reader
 
     fun look_ahead() {
         var ch: char = this.source[pos];
-        ++pos;
+        pos++;
         return ch;
     }
 
@@ -17,4 +17,5 @@ object source_reader
 
 fun main(argc: int, varargs args: string) {
     var reader: object source_reader();
+    println(reader.look_ahead() + 255.0);
 }
