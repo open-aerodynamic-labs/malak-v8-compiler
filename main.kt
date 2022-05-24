@@ -14,7 +14,6 @@ object xep_source_reader
     }
 }
 
-
 fun main(argc: int, varargs args: string) {
     var reader: xep_source_reader();
     println(reader->look_ahead() + 255.0);

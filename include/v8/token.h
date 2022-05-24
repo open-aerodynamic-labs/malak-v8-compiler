@@ -70,10 +70,10 @@ typedef unsigned tokenkind_t;
  * token
  */
 struct token {
-      tokenkind_t kind;
-      std::string value;
-      int line;
-      int col;
+      tokenkind_t       kind;
+      std::string       value;
+      int               line;
+      int               col;
 };
 
 /** 创建一个token */
