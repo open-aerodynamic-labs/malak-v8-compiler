@@ -14,11 +14,3 @@
  * limitations under the License.
  */
 #include "v8/ast.h"
-
-void xep_ast_pars(std::vector<struct token> &tokens, xep_ast_node *root)
-{
-      /* 遍历token列表 */
-      for (auto &tok : tokens) {
-
-      }
-}
