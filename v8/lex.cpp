@@ -95,6 +95,8 @@ void init_eoic_map(eoimap_t *map)
       xep_add_lexc(map, '[', KIND_OPEN_BRACKET);
       xep_add_lexc(map, ']', KIND_CLOSE_BRACKET);
       xep_add_lexc(map, ':', KIND_COLON);
+      xep_add_lexc(map, '>', KIND_GT);
+      xep_add_lexc(map, '<', KIND_LT);
       xep_add_lexc(map, '\0', KIND_EOF);
 }
 
@@ -416,6 +418,42 @@ std::vector<struct token> xep_run_lexc(std::string &src)
                               }
                         }
 
+                        if (ch == '<') {
+                              switch (reader.peek_next()) {
+                                    case '<': {
+                                          reader.skip_next();
+                                          buftok = "<<";
+                                          xep_push_token(buftok, KIND_LSHIFT);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = "<=";
+                                          xep_push_token(buftok, KIND_LTEQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                              }
+                        }
+
+                        if (ch == '>') {
+                              switch (reader.peek_next()) {
+                                    case '>': {
+                                          reader.skip_next();
+                                          buftok = ">";
+                                          xep_push_token(buftok, KIND_RSHIFT);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = ">=";
+                                          xep_push_token(buftok, KIND_GTEQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                              }
+                        }
+
                         buftok.push_back(ch);
                         eoimap[ch](&tokenkind);
 
@@ -452,11 +490,6 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
 FLAG_LOOK_AHEAD_CONTINUE:
             continue;
-      }
-
-      /* 遍历token */
-      for (auto &itok : tokens) {
-            xep_print_token(itok);
       }
 
       return tokens;

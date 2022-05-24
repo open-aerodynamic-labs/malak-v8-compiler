@@ -76,6 +76,12 @@
 #define KIND_SUBEQ                    3019
 #define KIND_STAREQ                   3020
 #define KIND_SLASHEQ                  3021
+#define KIND_GT                       3022
+#define KIND_LT                       3023
+#define KIND_GTEQ                     3024
+#define KIND_LTEQ                     3025
+#define KIND_LSHIFT                   3026
+#define KIND_RSHIFT                   3027
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1

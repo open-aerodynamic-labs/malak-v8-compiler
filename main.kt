@@ -1,3 +1,3 @@
-fun main(argc: int, varargs args: string) {
-
+fun main(varargs args: string) {
+    if (1 >= 1);
 }

@@ -24,7 +24,11 @@ int main()
                           (std::istreambuf_iterator<char>()));
       ifs.close();
 
-      xep_run_lexc(source);
+      std::vector<struct token> tokens = xep_run_lexc(source);
+      /* 遍历token */
+      for (auto &itok : tokens) {
+            xep_print_token(itok);
+      }
 
       return 0;
 }
