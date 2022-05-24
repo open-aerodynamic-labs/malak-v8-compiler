@@ -15,7 +15,7 @@
  */
 #include "srcreader.h"
 
-SourceReader::SourceReader(const std::string &source)
+xep_source_reader::xep_source_reader(const std::string &source)
 {
       self_line = 1;
       self_col = 0;
@@ -24,7 +24,7 @@ SourceReader::SourceReader(const std::string &source)
       self_src_size = self_source.size();
 }
 
-bool SourceReader::look_ahead(char *p_ch, int *p_line, int *p_col)
+bool xep_source_reader::look_ahead(char *p_ch, int *p_line, int *p_col)
 {
       bool iseof = eof();
       if (!iseof) {
@@ -46,7 +46,7 @@ bool SourceReader::look_ahead(char *p_ch, int *p_line, int *p_col)
       return iseof;
 }
 
-void SourceReader::back(int *p_line, int *p_col)
+void xep_source_reader::back(int *p_line, int *p_col)
 {
       if (self_pos > 0) {
             self_pos--;
@@ -64,12 +64,17 @@ void SourceReader::back(int *p_line, int *p_col)
       *p_col = self_col;
 }
 
-const bool SourceReader::eof()
+const bool xep_source_reader::eof()
 {
       return self_pos >= self_src_size;
 }
 
-char SourceReader::peek_next()
+void xep_source_reader::skip_next()
+{
+      self_pos++;
+}
+
+char xep_source_reader::peek_next()
 {
       if (self_pos < self_src_size) {
             return self_source[self_pos];

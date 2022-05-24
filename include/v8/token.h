@@ -58,6 +58,7 @@
 #define KIND_COLON                    3014
 #define KIND_ADDADD                   3015
 #define KIND_SUBSUB                   3016
+#define KIND_ARROW                    3017
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1

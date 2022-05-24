@@ -94,7 +94,7 @@ void init_eoic_map(eoimap_t *map)
  * @param col       列号
  * @return          读取到的数字
  */
-std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoimap, int *line, int *col)
+std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t *eoimap, int *line, int *col)
 {
       std::stringstream       buf;
       std::string             buftok;
@@ -141,7 +141,6 @@ std::string lexc_read_number(char ch, SourceReader &reader, const eoimap_t *eoim
                               continue;
                         } else {
                               buftok.insert(0, "D");
-                              continue;
                         }
                   }
             }
@@ -181,7 +180,7 @@ FLAG_THROW_INVALID_NUMBER:
  * @param col       列号
  * @return          读取到的字符串
  */
-std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
+std::string lexc_read_string(char ch, xep_source_reader &reader, int *line, int *col)
 {
       std::stringstream       buf;
       int                     strline = *line;
@@ -229,7 +228,7 @@ std::string lexc_read_string(char ch, SourceReader &reader, int *line, int *col)
  * @param col       列号
  * @return          读取到的字符串
  */
-std::string lexc_read_character(char ch, SourceReader &reader, int *line, int *col)
+std::string lexc_read_character(char ch, xep_source_reader &reader, int *line, int *col)
 {
       std::stringstream       buf;
 
@@ -299,7 +298,7 @@ std::vector<struct token> xep_run_lexc(std::string &src)
       char                          ch;
       std::stringstream             buf;
       struct token                  tok;
-      SourceReader                  reader(src);
+      xep_source_reader             reader(src);
       int                           line;
       int                           col;
       std::vector<struct token>     tokens;
@@ -323,9 +322,9 @@ std::vector<struct token> xep_run_lexc(std::string &src)
       /* 循环读入字符 */
       while (!reader.look_ahead(&ch, &line, &col)) {
             // 判断是否是eoi符号
-            bool curch_is_eoi = eoimap.count(ch) > 0;
+            bool eoi_ch = eoimap.count(ch) > 0;
 
-            if (isspace(ch) || curch_is_eoi) {
+            if (isspace(ch) || eoi_ch) {
                   buftok = buf.str();
 
                   // 如果是空格或者结束符，则认为是结束。添加当前缓存内容到token列表
@@ -340,52 +339,65 @@ std::vector<struct token> xep_run_lexc(std::string &src)
                   }
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
-                  if (curch_is_eoi) {
+                  if (eoi_ch) {
                         if (ch == '+' && reader.peek_next() == '+') {
                               buftok.push_back(ch);
                               reader.look_ahead(&ch, &line, &col);
                               buftok.push_back(ch);
                               xep_push_token(buftok, KIND_ADDADD);
-                        } else if (ch == '+' && reader.peek_next() == '+') {
-                              buftok.push_back(ch);
-                              reader.look_ahead(&ch, &line, &col);
-                              buftok.push_back(ch);
-                              xep_push_token(buftok, KIND_SUBSUB);
-                        } else {
-                              buftok.push_back(ch);
-                              eoimap[ch](&tokenkind);
+                              goto FLAG_LOOK_AHEAD_CONTINUE;
+                        }
 
-                              if (tokenkind != KIND_NOP) {
-                                    xep_push_token(buftok, tokenkind);
+                        if (ch == '-') {
+                              if (reader.peek_next() == '-') {
+                                    reader.skip_next();
+                                    buftok = "--";
+                                    xep_push_token(buftok, KIND_SUBSUB);
+                                    goto FLAG_LOOK_AHEAD_CONTINUE;
+                              } else if (reader.peek_next() == '>') {
+                                    reader.skip_next();
+                                    buftok = "->";
+                                    xep_push_token(buftok, KIND_ARROW);
+                                    goto FLAG_LOOK_AHEAD_CONTINUE;
                               }
+                        }
+
+                        buftok.push_back(ch);
+                        eoimap[ch](&tokenkind);
+
+                        if (tokenkind != KIND_NOP) {
+                              xep_push_token(buftok, tokenkind);
                         }
                   }
 
-                  continue;
+                  goto FLAG_LOOK_AHEAD_CONTINUE;
             }
 
             /* 读到char */
             if (ch == '\'') {
                   buftok = lexc_read_character(ch, reader, &line, &col);
                   xep_push_token(buftok, KIND_CHARACTER_LITERAL);
-                  continue;
+                  goto FLAG_LOOK_AHEAD_CONTINUE;
             }
 
             /* 读取到string */
             if (ch == '"') {
                   buftok = lexc_read_string(ch, reader, &line, &col);
                   xep_push_token(buftok, KIND_STRING_LITERAL);
-                  continue;
+                  goto FLAG_LOOK_AHEAD_CONTINUE;
             }
 
             /* 读到数字, 就一直循环往下读。知道读取到的内容不是数字为止 */
             if (isnumber(ch) && buf.str().length() == 0) {
                   buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
                   xep_push_token(buftok, KIND_NUMBER);
-                  continue;
+                  goto FLAG_LOOK_AHEAD_CONTINUE;
             }
 
             buf << ch;
+
+FLAG_LOOK_AHEAD_CONTINUE:
+            continue;
       }
 
       /* 遍历token */

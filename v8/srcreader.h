@@ -20,16 +20,18 @@
 #include <string>
 
 /** 源码读取器 */
-class SourceReader {
+class xep_source_reader {
 public:
       /** 读取字符串 */
-      SourceReader(const std::string &source);
+      xep_source_reader(const std::string &source);
       /** 读取下一个字符 */
       bool look_ahead(char *p_ch, int *p_line, int *p_col);
       /** 回退到上一个字符 */
       void back(int *p_line, int *p_col);
       /* 查看下一个字符 */
       char peek_next();
+      /* 跳到下一个字符 */
+      void skip_next();
       /** 是否读到文件末尾 */
       const bool eof();
 

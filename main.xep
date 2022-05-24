@@ -1,9 +1,9 @@
-object source_reader
+object xep_source_reader
 {
     var source: string;
     var pos: int;
 
-    fun source_reader(source: string) {
+    fun xep_source_reader(source: string) {
         this.source = source;
     }
 
@@ -12,10 +12,10 @@ object source_reader
         pos++;
         return ch;
     }
-
 }
 
+
 fun main(argc: int, varargs args: string) {
-    var reader: object source_reader();
-    println(reader.look_ahead() + 255.0);
+    var reader: xep_source_reader();
+    println(reader->look_ahead() + 255.0);
 }
