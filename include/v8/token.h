@@ -33,6 +33,19 @@
 #define KIND_GOTO                     1011
 #define KIND_OBJECT                   1012
 #define KIND_THIS                     1013
+#define KIND_STATIC                   1014
+#define KIND_CONST                    1015
+#define KIND_IF                       1016
+#define KIND_ELSE                     1017
+#define KIND_ELIF                     1018
+#define KIND_FOR                      1019
+#define KIND_WHILE                    1020
+#define KIND_DO                       1021
+#define KIND_SWITCH                   1022
+#define KIND_CASE                     1023
+#define KIND_DEFAULT                  1024
+#define KIND_BREAK                    1025
+#define KIND_CONTINUE                 1026
 
 /* 字面量 */
 #define KIND_IDENTIFIER               2001
@@ -59,6 +72,10 @@
 #define KIND_ADDADD                   3015
 #define KIND_SUBSUB                   3016
 #define KIND_ARROW                    3017
+#define KIND_ADDEQ                    3018
+#define KIND_SUBEQ                    3019
+#define KIND_STAREQ                   3020
+#define KIND_SLASHEQ                  3021
 
 #define KIND_NOP                         0
 #define KIND_EOI                         1

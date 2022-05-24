@@ -60,6 +60,20 @@ void init_lexc_map(lexmap_t *map)
       xep_add_lexc(map, "goto", KIND_GOTO);
       xep_add_lexc(map, "object", KIND_OBJECT);
       xep_add_lexc(map, "this", KIND_THIS);
+      xep_add_lexc(map, "static", KIND_STATIC);
+      xep_add_lexc(map, "const", KIND_CONST);
+      xep_add_lexc(map, "if", KIND_IF);
+      xep_add_lexc(map, "else", KIND_ELSE);
+      xep_add_lexc(map, "elif", KIND_ELIF);
+      xep_add_lexc(map, "while", KIND_WHILE);
+      xep_add_lexc(map, "for", KIND_FOR);
+      xep_add_lexc(map, "do", KIND_DO);
+      xep_add_lexc(map, "break", KIND_BREAK);
+      xep_add_lexc(map, "continue", KIND_CONTINUE);
+      xep_add_lexc(map, "switch", KIND_SWITCH);
+      xep_add_lexc(map, "case", KIND_CASE);
+      xep_add_lexc(map, "default", KIND_DEFAULT);
+
 }
 
 /** 初始化符号MAP */
@@ -340,25 +354,65 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 
                   // 如果是结束符判断是不是特殊符号，比如：'=', '(', ')'等字符
                   if (eoi_ch) {
-                        if (ch == '+' && reader.peek_next() == '+') {
-                              buftok.push_back(ch);
-                              reader.look_ahead(&ch, &line, &col);
-                              buftok.push_back(ch);
-                              xep_push_token(buftok, KIND_ADDADD);
-                              goto FLAG_LOOK_AHEAD_CONTINUE;
+                        if (ch == '+') {
+                              switch (reader.peek_next()) {
+                                    case '+': {
+                                          reader.skip_next();
+                                          buftok = "++";
+                                          xep_push_token(buftok, KIND_ADDADD);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = "+=";
+                                          xep_push_token(buftok, KIND_ADDEQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                              }
                         }
 
                         if (ch == '-') {
-                              if (reader.peek_next() == '-') {
-                                    reader.skip_next();
-                                    buftok = "--";
-                                    xep_push_token(buftok, KIND_SUBSUB);
-                                    goto FLAG_LOOK_AHEAD_CONTINUE;
-                              } else if (reader.peek_next() == '>') {
-                                    reader.skip_next();
-                                    buftok = "->";
-                                    xep_push_token(buftok, KIND_ARROW);
-                                    goto FLAG_LOOK_AHEAD_CONTINUE;
+                              switch (reader.peek_next()) {
+                                    case '-': {
+                                          reader.skip_next();
+                                          buftok = "--";
+                                          xep_push_token(buftok, KIND_SUBSUB);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                                    case '>': {
+                                          reader.skip_next();
+                                          buftok = "->";
+                                          xep_push_token(buftok, KIND_ARROW);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = "-=";
+                                          xep_push_token(buftok, KIND_SUBEQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                              }
+                        }
+
+                        if (ch == '*') {
+                              switch (reader.peek_next()) {
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = "*=";
+                                          xep_push_token(buftok, KIND_STAREQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
+                              }
+                        }
+
+                        if (ch == '/') {
+                              switch (reader.peek_next()) {
+                                    case '=': {
+                                          reader.skip_next();
+                                          buftok = "/=";
+                                          xep_push_token(buftok, KIND_SLASHEQ);
+                                          goto FLAG_LOOK_AHEAD_CONTINUE;
+                                    }
                               }
                         }
 
