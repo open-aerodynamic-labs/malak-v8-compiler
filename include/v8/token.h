@@ -108,8 +108,8 @@ typedef unsigned tokenkind_t;
 struct token {
       tokenkind_t       kind;
       std::string       value;
-      int               line;
-      int               col;
+      int               lineno;
+      int               colno;
 };
 
 /** 创建一个token */
@@ -119,8 +119,8 @@ inline static void xep_make_token(struct token *p_token, std::string &v, tokenki
 {
       p_token->kind = kind;
       p_token->value = v;
-      p_token->line = line;
-      p_token->col = col;
+      p_token->lineno = line;
+      p_token->colno = col;
 }
 
 /**

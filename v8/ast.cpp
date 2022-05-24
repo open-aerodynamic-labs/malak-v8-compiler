@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __EPOCH_PARS_H__
-#define __EPOCH_PARS_H__
+#include "v8/ast.h"
 
-#include "ast.h"
+void xep_ast_pars(std::vector<struct token> &tokens, xep_ast_node *root)
+{
+      /* 遍历token列表 */
+      for (auto &tok : tokens) {
 
-#endif /* __EPOCH_PARS_H__ */
+      }
+}
