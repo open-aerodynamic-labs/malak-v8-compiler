@@ -98,6 +98,10 @@ void init_eoic_map(eoimap_t *map)
       xep_add_lexc(map, ':', KIND_COLON);
       xep_add_lexc(map, '>', KIND_GT);
       xep_add_lexc(map, '<', KIND_LT);
+      xep_add_lexc(map, '|', KIND_OR);
+      xep_add_lexc(map, '&', KIND_AND);
+      xep_add_lexc(map, '~', KIND_NOT);
+      xep_add_lexc(map, '^', KIND_XOR);
       xep_add_lexc(map, '\0', KIND_EOF);
 }
 
@@ -473,6 +477,64 @@ std::vector<struct token> xep_run_lexc(std::string &src)
                                                 reader.skip_next();
                                                 buftok = "==";
                                                 xep_push_token(buftok, KIND_EQEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '|': {
+                                    switch (reader.peek_next()) {
+                                          case '|': {
+                                                reader.skip_next();
+                                                buftok = "||";
+                                                xep_push_token(buftok, KIND_OROR);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "|=";
+                                                xep_push_token(buftok, KIND_OREQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '&': {
+                                    switch (reader.peek_next()) {
+                                          case '&': {
+                                                reader.skip_next();
+                                                buftok = "&&";
+                                                xep_push_token(buftok, KIND_ANDAND);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "&=";
+                                                xep_push_token(buftok, KIND_ANDEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '~': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "~=";
+                                                xep_push_token(buftok, KIND_NOTEQ);
+                                                goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+                                    }
+                              }
+
+                              case '^': {
+                                    switch (reader.peek_next()) {
+                                          case '=': {
+                                                reader.skip_next();
+                                                buftok = "^=";
+                                                xep_push_token(buftok, KIND_XOREQ);
                                                 goto FLAG_LOOK_AHEAD_CONTINUE;
                                           }
                                     }
