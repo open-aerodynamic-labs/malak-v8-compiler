@@ -123,7 +123,11 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
       std::stringstream       buf;
       std::string             buftok;
 
-      buf << ch;
+      /* 如果当前数字是减号，那么在return的时候添加到前缀 */
+      bool is_sub_symbol = ch == '-';
+      if (!is_sub_symbol)
+            buf << ch;
+
       int phase = PHASE_INTEGER;
 
       while(!reader.look_ahead(&ch, line, col)) {
@@ -204,6 +208,10 @@ std::string lexc_read_number(char ch, xep_source_reader &reader, const eoimap_t 
                   goto FLAG_THROW_INVALID_NUMBER;
 
             reader.back(line, col);
+
+            if (is_sub_symbol)
+                  buftok.insert(1, "-");
+
             return buftok;
       }
 
@@ -407,17 +415,28 @@ std::vector<struct token> xep_run_lexc(std::string &src)
                                                 xep_push_token(buftok, KIND_SUBSUB);
                                                 goto FLAG_LOOK_AHEAD_CONTINUE;
                                           }
+
                                           case '>': {
                                                 reader.skip_next();
                                                 buftok = "->";
                                                 xep_push_token(buftok, KIND_ARROW);
                                                 goto FLAG_LOOK_AHEAD_CONTINUE;
                                           }
+
                                           case '=': {
                                                 reader.skip_next();
                                                 buftok = "-=";
                                                 xep_push_token(buftok, KIND_SUBEQ);
                                                 goto FLAG_LOOK_AHEAD_CONTINUE;
+                                          }
+
+                                          /* 如果是数字，那么有可能是负数。交给数字解析函数去解析 */
+                                          default: {
+                                                if (isnumber(reader.peek_next())) {
+                                                      buftok = lexc_read_number(ch, reader, &eoimap, &line, &col);
+                                                      xep_push_token(buftok, KIND_NUMBER);
+                                                      goto FLAG_LOOK_AHEAD_CONTINUE;
+                                                }
                                           }
                                     }
                               }
