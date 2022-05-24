@@ -16,7 +16,7 @@
 #ifndef __EPOCH_LEX_H__
 #define __EPOCH_LEX_H__
 
-#include "v8/token.h"
+#include "token.h"
 #include <vector>
 
 std::vector<struct token> xep_run_lexc(std::string &src);
