@@ -76,6 +76,7 @@ void init_lexc_map(lexmap_t *map)
       xep_add_lexc(map, "case", KIND_CASE);
       xep_add_lexc(map, "default", KIND_DEFAULT);
       xep_add_lexc(map, "sizeof", KIND_SIZEOF);
+      xep_add_lexc(map, "null", KIND_NULL);
 
 }
 

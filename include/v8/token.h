@@ -47,6 +47,7 @@
 #define KIND_BREAK                  1025
 #define KIND_CONTINUE               1026
 #define KIND_SIZEOF                 1027
+#define KIND_NULL                   1028
 
 /* 字面量 */
 #define KIND_IDENTIFIER             2001
