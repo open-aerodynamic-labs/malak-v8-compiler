@@ -20,7 +20,7 @@
 #include <stdexcept>
 
 /* 关键字 */
-#define KIND_VAR                    1001
+#define KIND_LET                    1001
 #define KIND_FUN                    1002
 #define KIND_CHAR                   1003
 #define KIND_INT                    1004

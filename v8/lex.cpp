@@ -48,7 +48,7 @@ typedef std::map<char, f_lexc>            eoimap_t;
 /** 初始化词法MAP */
 void init_lexc_map(lexmap_t *map)
 {
-      xep_add_lexc(map, "var", KIND_VAR);
+      xep_add_lexc(map, "let", KIND_LET);
       xep_add_lexc(map, "char", KIND_CHAR);
       xep_add_lexc(map, "int", KIND_INT);
       xep_add_lexc(map, "long", KIND_LONG);
