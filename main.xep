@@ -1,4 +1,9 @@
-fun main(varargs args: string): void {
-    let f: struct *FILE = fopen();
-    println("Hello World!");
-}
+struct _file_t {
+    let fhd: *byte;
+    let bufsiz: int;
+    let flag: int;
+};
+
+__builtin fun fopen(path: *char) => *_file_t;
+__builtin fun fclose(fp: *_file_t) => int;
+__builtin fun fread(fp: *_file_t, buf: *char, pos: int, size: int) => int;
