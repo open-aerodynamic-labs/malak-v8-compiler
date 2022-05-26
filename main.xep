@@ -1,26 +1,27 @@
-object File {
-
-    let path: string;
-
-    _fun File(path: string): this;
-
-    __builtin fun open(): bool;
-    __builtin fun close(): bool;
-
-    fun read(pos: int, size: int, buf: *byte): int;
-    fun readall(): *byte;
-
+struct FILE {
+    let fhd: *byte;
+    let flag: int;
 }
 
-fun main(varargs args: string) {
+enum _SeekMode { EOF, SET, CUR }
 
-    let fd: File("/etc/passwd");
+__fundecl fun fopen(fp: *FILE, path: string): int;
+__fundecl fun fclose(fp: *FILE): int;
+__fundecl fun fread(buf: *void, size: long, count: int, fp: *FILE): int;
+__fundecl fun fwrite(buf: *void, size: long, count: int, fp: *FILE): int;
+__fundecl fun fseek(fp: *FILE, off: long, whence: _SeekMode): int;
+__fundecl fun ftell(fp: *FILE): long;
+__fundecl fun freadall(fp: *FILE): *byte; /* 文件所有内容，以及文件大小 */
+__fundecl fun fappend(buf: *void, size: long, count: int, fp: *FILE): int;
 
-    if (!fd->open()) {
-        throw Runtime("open failed");
-    }
-
-    let srccode: string = fd->readall => valueof;
-    println(srccode);
-
+fun fsize(fp: *FILE): long {
+    let pos = ftell(fp);
+    fseek(fp, 0, SEEK_END);
+    let size = ftell(fp);
+    fseek(fp, pos, SEEK_SET);
+    return size;
 }
+
+fun fputc(c: int, fp: *FILE): int = fwrite(&c, sizeof(int), 1, fp);
+fun fputs(str: string, fp: *FILE): int = fwrite(str.cptr(), lenof(str), 1, fp);
+fun fgetc(fp: *FILE): int = fread(&c, sizeof(int), 1, fp);

@@ -49,7 +49,7 @@
 #define KIND_SIZEOF                 1027
 #define KIND_NULL                   1028
 #define KIND_STRUCT                 1029
-#define KIND_BUILTIN                1030
+#define KIND_FUNDECL                1030
 #define KIND_VOID                   1031
 #define KIND_BYTE                   1032
 
