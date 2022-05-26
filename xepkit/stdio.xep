@@ -1,19 +1,12 @@
-struct FILE {
+object FILE {
     let path: string;
-    let flag: int;
+    let name: string;
     let bufsize: int;
+    let mode: int;
+    let flag: int;
+
+    __builtin fun open() -> int;
+    __builtin fun close() -> int;
+    __builtin fun read(off: int, value: *string, len: int) -> int;
+    __builtin fun write(off: int, value: *string, len: int) -> int;
 }
-
-__builtin let stdin: *FILE;
-__builtin let stdout: *FILE;
-__builtin let stderr: *FILE;
-
-__builtin fun vfprint(p_fs: *FILE, str: *char, bufsiz: int): int;
-
-fun vfputc(p_fs: *FILE, int ch): int = vfprint(p_fs, &ch, 1);
-
-fun println(str: string): void {
-    vfprint(stdout, str.p_value, len(str));
-    vfputc(stdout, '\n');
-}
-

@@ -1,18 +1,6 @@
-struct FILE {
-    let path: string;
-    let flag: int;
-    let bufsize: int;
-}
+fun main(varargs args: string) -> void {
 
-__builtin let stdin: *FILE;
-__builtin let stdout: *FILE;
-__builtin let stderr: *FILE;
+    let fp: *FILE = fopen("/tmp/test.txt", "w")
+    fp->write(0, "Hello, world!\n", 14)
 
-__builtin fun vfprint(p_fs: *FILE, str: *char, bufsiz: int): int;
-
-fun vfputc(p_fs: *FILE, int ch): int = vfprint(p_fs, &ch, 1);
-
-fun println(str: string): void {
-    vfprint(stdout, str.p_value, len(str));
-    vfputc(stdout, '\n');
 }
