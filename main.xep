@@ -1,3 +1,18 @@
-fun main(varargs args: string) {
-    let x: int = 2 + 2 * 3 + 4 / 5;
+struct FILE {
+    let path: string;
+    let flag: int;
+    let bufsize: int;
+}
+
+__builtin let stdin: *FILE;
+__builtin let stdout: *FILE;
+__builtin let stderr: *FILE;
+
+__builtin fun vfprint(p_fs: *FILE, str: *char, bufsiz: int): int;
+
+fun vfputc(p_fs: *FILE, int ch): int = vfprint(p_fs, &ch, 1);
+
+fun println(str: string): void {
+    vfprint(stdout, str.p_value, len(str));
+    vfputc(stdout, '\n');
 }

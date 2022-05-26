@@ -48,6 +48,8 @@
 #define KIND_CONTINUE               1026
 #define KIND_SIZEOF                 1027
 #define KIND_NULL                   1028
+#define KIND_STRUCT                 1029
+#define KIND_BUILTIN                1030
 
 /* 字面量 */
 #define KIND_IDENTIFIER             2001
