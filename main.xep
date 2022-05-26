@@ -1,4 +1,4 @@
-fun main(varargs args: string) => void {
+fun main(varargs args: string): void {
     let f: struct *FILE = fopen();
     println("Hello World!");
 }
