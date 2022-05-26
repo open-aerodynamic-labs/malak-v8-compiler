@@ -1,9 +1,26 @@
-struct _file_t {
-    let fhd: *byte;
-    let bufsiz: int;
-    let flag: int;
-};
+object File {
 
-__builtin fun fopen(path: *char) => *_file_t;
-__builtin fun fclose(fp: *_file_t) => int;
-__builtin fun fread(fp: *_file_t, buf: *char, pos: int, size: int) => int;
+    let path: string;
+
+    _fun File(path: string): this;
+
+    __builtin fun open(): bool;
+    __builtin fun close(): bool;
+
+    fun read(pos: int, size: int, buf: *byte): int;
+    fun readall(): *byte;
+
+}
+
+fun main(varargs args: string) {
+
+    let fd: File("/etc/passwd");
+
+    if (!fd->open()) {
+        throw Runtime("open failed");
+    }
+
+    let srccode: string = fd->readall => valueof;
+    println(srccode);
+
+}
