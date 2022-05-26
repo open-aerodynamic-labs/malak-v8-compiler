@@ -99,6 +99,7 @@
 #define KIND_ANDEQ                  3036
 #define KIND_NOTEQ                  3037
 #define KIND_XOREQ                  3038
+#define KIND_EQARROW                3039
 
 #define KIND_NOP                       0
 #define KIND_EOI                       1

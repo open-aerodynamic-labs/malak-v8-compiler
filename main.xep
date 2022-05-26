@@ -1,11 +1,4 @@
-object FILE {
-    let path: string;
-    let name: string;
-    let bufsize: int;
-    let mode: int;
-    let flag: int;
-
-    __builtin fun fopen() => *FILE;
-    __builtin fun fclose() => int;
-
+fun main(varargs args: string) => void {
+    let f: struct *FILE = fopen();
+    println("Hello World!");
 }

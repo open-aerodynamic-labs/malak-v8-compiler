@@ -533,6 +533,13 @@ std::string xep_read_eoi(char ch, xep_source_reader &reader, eoimap_t &eoimap,
                               *kind = KIND_EQEQ;
                               return buftok;
                         }
+
+                        case '>': {
+                              reader.skip_next();
+                              buftok = "=>";
+                              *kind = KIND_EQARROW;
+                              return buftok;
+                        }
                   }
 
                   goto JUMP_TO_DEFAULT;
