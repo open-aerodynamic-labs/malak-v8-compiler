@@ -633,7 +633,7 @@ JUMP_TO_DEFAULT:
  * @param src     源码
  * @return        词法分析结果
  */
-std::vector<struct token> xep_run_lexc(std::string &src)
+void xep_run_lexc(std::string &src, std::vector<struct token> &tokens)
 {
       char                          ch;
       std::stringstream             buf;
@@ -641,7 +641,6 @@ std::vector<struct token> xep_run_lexc(std::string &src)
       xep_source_reader             reader(src);
       int                           line;
       int                           col;
-      std::vector<struct token>     tokens;
       lexmap_t                      lexmap;
       eoimap_t                      eoimap;
       tokenkind_t                   tokenkind;
@@ -715,6 +714,4 @@ std::vector<struct token> xep_run_lexc(std::string &src)
 FLAG_LOOK_AHEAD_CONTINUE:
             continue;
       }
-
-      return tokens;
 }

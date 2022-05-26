@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/lex.h"
 #include "v8/parser.h"
-#include <iostream>
-#include <fstream>
 
-int main()
+/** 语法解析 */
+void xep_run_parser(std::vector<struct token> &tokens)
 {
-      std::ifstream ifs("../main.xep");
-      std::string source((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
-      ifs.close();
+      struct token      *p_tok;
+      xep_token_reader   reader(tokens);
 
-      std::vector<struct token> tokens;
+      while((p_tok = reader.look_ahead()) != nullptr) {
 
-      /* 阶段【1】- 词法解析 */
-      xep_run_lexc(source, tokens);
+            switch(p_tok->kind) {
 
-      /* 阶段【2】- 语法解析 */
-      xep_run_parser(tokens);
+                  /**
+                   * fun        -> fun identifier '(' parameters ')'
+                   * parameters -> identifier ':' type *parameters
+                   * return     -> ':' type
+                   * block      -> '{' statements '}'
+                   */
+                  case KIND_FUN: {
 
-      return 0;
+                  }
+
+            }
+      }
 }

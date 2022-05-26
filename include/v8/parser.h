@@ -17,5 +17,36 @@
 #define __EPOCH_PARS_H__
 
 #include "ast.h"
+#include <vector>
+
+/** token读取器 */
+class xep_token_reader {
+public:
+      xep_token_reader(std::vector<struct token> &tokens) : _tokens(tokens)
+      {
+            _pos = 0;
+            _siz = tokens.size();
+      }
+
+      struct token *look_ahead()
+      {
+            if (_pos >= _siz)
+                  return nullptr;
+
+            auto *p_tok = &_tokens[_pos];
+            _pos++;
+
+            return p_tok;
+      }
+
+private:
+      int                           _pos;
+      int                           _siz;
+      std::vector<struct token>    &_tokens;
+
+};
+
+/** 语法解析 */
+void xep_run_parser(std::vector<struct token> &tokens);
 
 #endif /* __EPOCH_PARS_H__ */

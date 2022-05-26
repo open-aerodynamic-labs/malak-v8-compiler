@@ -17,6 +17,47 @@
 #define __EPOCH_AST_H__
 
 #include "token.h"
-#include <vector>
+
+struct xep_string_node {
+      struct token * token;
+      char         * value;
+};
+
+struct xep_int32_node {
+      struct token * token;
+      int32_t        value;
+};
+
+struct xep_int64_node {
+      struct token * token;
+      int64_t        value;
+};
+
+struct xep_float_node {
+      struct token * token;
+      float          value;
+};
+
+struct xep_double_node {
+      struct token * token;
+      double         value;
+};
+
+struct xep_bool_node {
+      struct token * token;
+      char           value;
+};
+
+struct xep_char_node {
+      struct token * token;
+      char           value;
+};
+
+struct xep_operate_node {
+      struct token * token;
+      char           value;
+      void *         left;
+      void *         right;
+};
 
 #endif /* __EPOCH_AST_H__ */
