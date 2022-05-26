@@ -52,10 +52,10 @@
 #define KIND_FUNDECL                1030
 #define KIND_VOID                   1031
 #define KIND_BYTE                   1032
+#define KIND_STRING                 1034
 
 /* 字面量 */
 #define KIND_IDENTIFIER             2001
-#define KIND_STRING                 2002
 #define KIND_NUMBER                 2003
 #define KIND_STRING_LITERAL         2004
 #define KIND_CHARACTER_LITERAL      2005
