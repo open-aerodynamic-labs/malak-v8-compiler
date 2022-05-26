@@ -25,3 +25,4 @@ fun fsize(fp: *FILE): long {
 fun fputc(c: int, fp: *FILE): int = fwrite(&c, sizeof(int), 1, fp);
 fun fputs(str: string, fp: *FILE): int = fwrite(str.cptr(), lenof(str), 1, fp);
 fun fgetc(fp: *FILE): int = fread(&c, sizeof(int), 1, fp);
+fun fgets(str: *string, size: long, fp: *FILE): int = fread(str.cptr(), size, 1, fp);
