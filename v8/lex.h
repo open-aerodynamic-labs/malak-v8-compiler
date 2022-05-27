@@ -19,6 +19,7 @@
 #include "token.h"
 #include <vector>
 
+/** 词法解析器，返回token列表 */
 void xep_run_lexc(std::string &src, std::vector<struct token> &tokens);
 
 #endif /* __EPOCH_LEX_H__ */
