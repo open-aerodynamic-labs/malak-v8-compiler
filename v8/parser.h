@@ -17,7 +17,6 @@
 #define __EPOCH_PARS_H__
 
 #include "ast.h"
-#include <vector>
 
 /** token读取器 */
 class xep_token_reader {

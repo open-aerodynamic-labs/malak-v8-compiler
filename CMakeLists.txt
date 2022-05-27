@@ -3,6 +3,7 @@ project(epoch)
 
 set(CMAKE_CXX_STANDARD 23)
 
+include_directories(${PROJECT_SOURCE_DIR}/)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 aux_source_directory(${PROJECT_SOURCE_DIR}/v8 SRC_V8)

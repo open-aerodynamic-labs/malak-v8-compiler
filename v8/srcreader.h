@@ -16,7 +16,6 @@
 #ifndef __EPOCH_SOURCE_READER_H__
 #define __EPOCH_SOURCE_READER_H__
 
-#include "v8def.h"
 #include <string>
 
 /** 源码读取器 */

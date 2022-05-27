@@ -19,6 +19,7 @@
 #include <string>
 #include <stdexcept>
 
+enum tokenkind_enumerate {
 /* 关键字 */
 #define KIND_LET                    1001
 #define KIND_FUN                    1002
@@ -105,6 +106,8 @@
 #define KIND_NOP                       0
 #define KIND_EOI                       1
 #define KIND_EOF                       2
+
+};
 
 typedef unsigned tokenkind_t;
 

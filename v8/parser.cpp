@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "v8/parser.h"
+#include "parser.h"
 
 /** 语法解析 */
 void xep_run_parser(std::vector<struct token> &tokens)
@@ -22,19 +22,6 @@ void xep_run_parser(std::vector<struct token> &tokens)
       xep_token_reader   reader(tokens);
 
       while((p_tok = reader.look_ahead()) != nullptr) {
-
-            switch(p_tok->kind) {
-
-                  /**
-                   * fun        -> fun identifier '(' parameters ')'
-                   * parameters -> identifier ':' type *parameters
-                   * return     -> ':' type
-                   * block      -> '{' statements '}'
-                   */
-                  case KIND_FUN: {
-
-                  }
-
-            }
+            xep_print_token(*p_tok);
       }
 }

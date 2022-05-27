@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef __EPOCH_V8DEF_H__
-#define __EPOCH_V8DEF_H__
+#ifndef __EPOCH_AST_H__
+#define __EPOCH_AST_H__
 
-#endif /* __EPOCH_V8DEF_H__ */
+#include "token.h"
+#include <vector>
+
+#endif /* __EPOCH_AST_H__ */
